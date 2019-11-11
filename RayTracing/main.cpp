@@ -180,10 +180,10 @@ int main(void)
 	camera.verticalAngle = 0.1 * pi;
 
 	//äÖÈ¾Ä¿±êÎÆÀí
-	unsigned int** framebuffer = ;
+	unsigned int** framebuffer = nullptr;
 
 	for (int j = 0; j < window_height; j++) {
-		framebuffer[j] = new unsigned int(window_height)
+		framebuffer[j] = new unsigned int(window_height);
 		for (int i = 0; i < window_width; i++)
 		{
 			/*float sum = ((int)122 << 16) + ((int)122 << 8) + 122;
