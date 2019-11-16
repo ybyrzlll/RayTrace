@@ -127,6 +127,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Camera.h" />
+    <ClInclude Include="debugTool.h" />
     <ClInclude Include="mesh.h" />
     <ClInclude Include="mMath.h" />
     <ClInclude Include="objParser.h" />

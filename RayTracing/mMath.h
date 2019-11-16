@@ -19,7 +19,7 @@ struct Vector3 {
 
 	Vector3 operator-() const
 	{
-		return Vector3(-x,-y,-z);
+		return Vector3(-x, -y, -z);
 	}
 	Vector3 operator + (const Vector3 rhs)const
 	{
@@ -27,8 +27,13 @@ struct Vector3 {
 	}
 	Vector3 operator - (const Vector3 rhs)const
 	{
-		return Vector3(x - rhs.x , y - rhs.y, z - rhs.z);
+		return Vector3(x - rhs.x, y - rhs.y, z - rhs.z);
 	}
+	Vector3 operator * (const T a) const
+	{
+		return Vector3(x * a, y * a, z * a);
+	}
+
 	T dot(const Vector3 rhs) const
 	{
 		return x * rhs.x + y * rhs.y + z * rhs.z;
@@ -42,7 +47,7 @@ struct Vector3 {
 	{
 		return sqrt(x * x + y * y + z * z);
 	}
-	Vector3 &normalized()
+	Vector3& normalized()
 	{
 		T len = length();
 		T factor = 1.0f / len;
@@ -55,3 +60,9 @@ struct Vector3 {
 
 typedef Vector3<float> Vector3f;
 typedef Vector3<int> Vector3i;
+
+
+struct Ray {
+	Vector3<float> pos;
+	Vector3<float> dir;
+};

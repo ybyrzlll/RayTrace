@@ -4,6 +4,14 @@
 #include "objParser.h"
 #include "mesh.h"
 #include "Camera.h"
+#include "debugTool.h"
+
+#include <iostream>
+using namespace std;
+
+Mesh cuboid, plane;
+
+
 
 //=====================================================================
 // Win32 窗口及图形绘制：为 device 提供一个 DibSection 的 FB
@@ -38,6 +46,7 @@ int screen_init(int w, int h, const TCHAR* title) {
 	//WNDPROC： 
 	WNDCLASS wc = { CS_BYTEALIGNCLIENT, (WNDPROC)screen_events, 0, 0, 0,
 		NULL, NULL, NULL, NULL, _T("SCREEN3.1415926") };
+	//32位图，多了个透明通道
 	BITMAPINFO bi = { { sizeof(BITMAPINFOHEADER), w, -h, 1, 32, BI_RGB,
 		w * h * 4, 0, 0, 0, 0 } };
 	RECT rect = { 0, 0, w, h };
@@ -153,15 +162,55 @@ void screen_update(void) {
 	screen_dispatch();
 }
 
+boolean intersect_Triangle(const Ray& ray) {
+	for (int i = 0; i < cuboid.numFaces; i++) {
+		////求交点
+		//Vector3f GE = cuboid.fGeneralEquation[i];
+		//float t = (-GE.w - GE.x * ray.pos.x - GE.y * ray.pos.y - GE.z * ray.pos.z) /
+		//	(GE.x * ray.dir.x + GE.y * ray.dir.y + GE.z * ray.dir.z);
+		//if (t < 0) continue;
+		//Vector3f intersect_point = ray.dir * t + ray.pos;
+
+		Vector3i indices = cuboid.vertexIndices[i];
+		Vector3f E1 = ray.dir;
+		Vector3f E2 = cuboid.vertices[indices.data[0]] - cuboid.vertices[indices.data[1]];
+		Vector3f E3 = cuboid.vertices[indices.data[0]] - cuboid.vertices[indices.data[2]];
+		Vector3f E4 = cuboid.vertices[indices.data[0]] - ray.pos;
+		float D1 = E4.x * E2.y * E3.z + E2.x * E3.y * E4.z + E3.x * E4.y * E2.z
+			- E3.x * E2.y - E4.z - E2.x * E4.y * E3.z - E4.x * E3.y * E2.z;
+		float D2 = E1.x * E4.y * E3.z + E4.x * E3.y * E1.z + E3.x * E1.y * E4.z
+			- E3.x * E4.y - E1.z - E4.x * E1.y * E3.z - E1.x * E3.y * E4.z;
+		float D3 = E1.x * E2.y * E4.z + E2.x * E4.y * E1.z + E4.x * E1.y * E2.z
+			- E4.x * E2.y - E1.z - E2.x * E1.y * E4.z - E1.x * E4.y * E2.z;
+		float D = E1.x * E2.y * E3.z + E2.x * E3.y * E1.z + E3.x * E1.y * E2.z
+			- E3.x * E2.y - E1.z - E2.x * E1.y * E3.z - E1.x * E3.y * E2.z;
+		float t = D1;
+		float lamda = D2 / D;
+		float beita = D3 / D;
+		if (t > 0 && 0 <= lamda && lamda <= 1 && 0 <= beita && beita <= 1) 
+			return true;
+	}
+	return false;
+}
+
+UINT32 castRay(const Ray& ray) {
+	if (intersect_Triangle(ray))
+		return ((int)122 << 16) + ((int)122 << 8) + 122;
+	else
+		return 0xffffffff;
+}
+
+
+
 int main(void)
 {
-	Mesh cuboid, plane;
+
 	buildMeshFromFile(cuboid, "Mesh/cuboid.obj");
 	buildMeshFromFile(plane, "Mesh/plane.obj");
-	cuboid.buildFacetNormal();
-	plane.buildFacetNormal();
+	cuboid.buildFacet();
+	plane.buildFacet();
 
-	int window_width = 800, window_height = 600;
+	int window_width = 400, window_height = 300;
 	//初始化窗口并设置标题
 	char text[] = _T("YeahBin (software render ) - ");
 	TCHAR* title = text;
@@ -171,41 +220,73 @@ int main(void)
 
 	//设置主相机
 	Camera camera;
+
 	camera.pos = { 5, 2.5, 5 };
 	camera.vpn = { -5, -2.5, -5 };
 	camera.vpn.normalized();
 	camera.up = { 0, 1, 0 };
-	camera.nearZ = 5;
-	camera.laterialAngle = 0.2 * pi;
-	camera.verticalAngle = 0.1 * pi;
+	camera.up.normalized();
+	camera.nearZ = 1;
+	camera.laterialAngle = 0.4 * pi;
+	camera.verticalAngle = 0.3 * pi;
 
-	//渲染目标纹理
-	unsigned int** framebuffer = nullptr;
+	int** test = new int* [4];
+	test[1] = new int[5];
+	test[1][0] = 1;
+	test[1][1] = 2;
 
+	//建立程序的fb--渲染目标纹理
+	UINT32** framebuffer = new UINT32 * [window_height];
+
+	char* framebuf = nullptr;
+	if (screen_fb != NULL) framebuf = (char*)screen_fb;
 	for (int j = 0; j < window_height; j++) {
-		framebuffer[j] = new unsigned int(window_height);
+		framebuffer[j] = new UINT32[window_width];
 		for (int i = 0; i < window_width; i++)
 		{
-			/*float sum = ((int)122 << 16) + ((int)122 << 8) + 122;
-			screen_fb[i * window_width * 4 + j * 4] = sum;*/
-			framebuffer[j] = (unsigned int*)screen_fb[j * window_width * 4];
+			framebuffer[j] = (UINT32*)(framebuf + j * window_width * 4);
 		}
 	}
 
-	//test
+	DWORD t_start;
 
 	while (1) {
 
-		for (int j = 200; j < 400; j++) {
-			for (int i = 0; i < 200; i++)
+		t_start = GetTickCount();
+
+		float half_h = tan(camera.verticalAngle) * camera.nearZ;
+		float half_w = tan(camera.laterialAngle) * camera.nearZ;
+		
+		Vector3f rightDir = (camera.up.crossProduct(camera.vpn)).normalized();
+		Vector3f pos_begin = camera.pos + camera.vpn.normalized() * camera.nearZ
+			+ camera.up * half_h - rightDir * half_w;
+		Vector3f rightFactor = rightDir * half_w * 2;
+		Vector3f downFactor = camera.up * half_h * 2 ;
+
+		Ray ray;
+		ray.pos = camera.pos;
+
+		for (int j = 0; j < window_height; j++) {
+			for (int i = 0; i < window_width; i++)
 			{
-				framebuffer[j][i] = ((int)122 << 16) + ((int)122 << 8) + 122;
+				ray.dir = pos_begin + rightFactor*((float)i / (float)window_width)
+					- downFactor * ((float)j / (float)window_height ) - ray.pos;
+				
+				ray.dir.normalized();
+				/*cout << j << "  " << i << endl;
+				showVector3(ray.dir);*/
+				framebuffer[j][i] = castRay(ray);//((int)122 << 16) + ((int)122 << 8) + 122;
 			}
 		}
 
 		screen_update();
+
+		float shrub = (float)10000 / (GetTickCount() - t_start);
+		cout << "帧数：" << shrub << endl;
+
 		Sleep(1);
 	}
 
 	return 0;
 }
+
