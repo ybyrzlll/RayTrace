@@ -1,6 +1,7 @@
 #pragma once
 #include <math.h>
 #define pi 3.1415926535
+#define c2z 0.00001
 
 template<typename T>
 struct Vector3 {

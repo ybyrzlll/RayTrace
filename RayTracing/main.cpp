@@ -177,17 +177,17 @@ boolean intersect_Triangle(const Ray& ray) {
 		Vector3f E3 = cuboid.vertices[indices.data[0]] - cuboid.vertices[indices.data[2]];
 		Vector3f E4 = cuboid.vertices[indices.data[0]] - ray.pos;
 		float D1 = E4.x * E2.y * E3.z + E2.x * E3.y * E4.z + E3.x * E4.y * E2.z
-			- E3.x * E2.y - E4.z - E2.x * E4.y * E3.z - E4.x * E3.y * E2.z;
+			- E3.x * E2.y * E4.z - E2.x * E4.y * E3.z - E4.x * E3.y * E2.z;
 		float D2 = E1.x * E4.y * E3.z + E4.x * E3.y * E1.z + E3.x * E1.y * E4.z
-			- E3.x * E4.y - E1.z - E4.x * E1.y * E3.z - E1.x * E3.y * E4.z;
+			- E3.x * E4.y * E1.z - E4.x * E1.y * E3.z - E1.x * E3.y * E4.z;
 		float D3 = E1.x * E2.y * E4.z + E2.x * E4.y * E1.z + E4.x * E1.y * E2.z
-			- E4.x * E2.y - E1.z - E2.x * E1.y * E4.z - E1.x * E4.y * E2.z;
+			- E4.x * E2.y * E1.z - E2.x * E1.y * E4.z - E1.x * E4.y * E2.z;
 		float D = E1.x * E2.y * E3.z + E2.x * E3.y * E1.z + E3.x * E1.y * E2.z
-			- E3.x * E2.y - E1.z - E2.x * E1.y * E3.z - E1.x * E3.y * E2.z;
+			- E3.x * E2.y * E1.z - E2.x * E1.y * E3.z - E1.x * E3.y * E2.z;
 		float t = D1;
 		float lamda = D2 / D;
 		float beita = D3 / D;
-		if (t > 0 && 0 <= lamda && lamda <= 1 && 0 <= beita && beita <= 1) 
+		if (t > c2z && c2z < lamda && lamda < 1 && c2z < beita && beita < 1 && lamda+ beita<1)
 			return true;
 	}
 	return false;
@@ -221,14 +221,14 @@ int main(void)
 	//设置主相机
 	Camera camera;
 
-	camera.pos = { 5, 2.5, 5 };
-	camera.vpn = { -5, -2.5, -5 };
+	camera.pos = { 2, 3, 2 };
+	camera.vpn = { -2, -3, -2 };
 	camera.vpn.normalized();
 	camera.up = { 0, 1, 0 };
 	camera.up.normalized();
 	camera.nearZ = 1;
-	camera.laterialAngle = 0.4 * pi;
-	camera.verticalAngle = 0.3 * pi;
+	camera.laterialAngle = 0.25 * pi;
+	camera.verticalAngle = 0.25 * pi;
 
 	int** test = new int* [4];
 	test[1] = new int[5];
@@ -256,12 +256,13 @@ int main(void)
 
 		float half_h = tan(camera.verticalAngle) * camera.nearZ;
 		float half_w = tan(camera.laterialAngle) * camera.nearZ;
-		
+
 		Vector3f rightDir = (camera.up.crossProduct(camera.vpn)).normalized();
+		Vector3f upDir = (camera.vpn.crossProduct(rightDir)).normalized();
 		Vector3f pos_begin = camera.pos + camera.vpn.normalized() * camera.nearZ
-			+ camera.up * half_h - rightDir * half_w;
+			+ upDir * half_h - rightDir * half_w;
 		Vector3f rightFactor = rightDir * half_w * 2;
-		Vector3f downFactor = camera.up * half_h * 2 ;
+		Vector3f downFactor = upDir * half_h * 2;
 
 		Ray ray;
 		ray.pos = camera.pos;
@@ -269,12 +270,14 @@ int main(void)
 		for (int j = 0; j < window_height; j++) {
 			for (int i = 0; i < window_width; i++)
 			{
-				ray.dir = pos_begin + rightFactor*((float)i / (float)window_width)
-					- downFactor * ((float)j / (float)window_height ) - ray.pos;
-				
+				ray.dir = pos_begin + rightFactor * ((float)i / (float)window_width)
+					- downFactor * ((float)j / (float)window_height) - ray.pos;
+
 				ray.dir.normalized();
-				/*cout << j << "  " << i << endl;
-				showVector3(ray.dir);*/
+				/*if (j == window_height -1) {
+					cout << j << "  " << i << endl;
+					showVector3(ray.dir);
+				}*/
 				framebuffer[j][i] = castRay(ray);//((int)122 << 16) + ((int)122 << 8) + 122;
 			}
 		}
