@@ -67,3 +67,6 @@ struct Ray {
 	Vector3<float> pos;
 	Vector3<float> dir;
 };
+
+template<typename T>
+static T clamp(T x, T min, T max) { return (x < min) ? min : ((x > max) ? max : x); }

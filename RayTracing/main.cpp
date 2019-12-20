@@ -7,10 +7,13 @@
 #include "debugTool.h"
 
 #include <iostream>
+#include "Intersect.h"
+#include "light.h"
+#include "Shader.h"
 using namespace std;
 
 Mesh cuboid, plane;
-
+vector<Light*> lights;
 
 
 //=====================================================================
@@ -162,7 +165,7 @@ void screen_update(void) {
 	screen_dispatch();
 }
 
-boolean intersect_Triangle(const Ray& ray) {
+boolean intersect_Triangle(const Ray& ray, Intersect& intersect) {
 	for (int i = 0; i < cuboid.numFaces; i++) {
 		////求交点
 		//Vector3f GE = cuboid.fGeneralEquation[i];
@@ -171,11 +174,12 @@ boolean intersect_Triangle(const Ray& ray) {
 		//if (t < 0) continue;
 		//Vector3f intersect_point = ray.dir * t + ray.pos;
 
-		Vector3i indices = cuboid.vertexIndices[i];
+		Vector3i *pIndices = &cuboid.vertexIndices[i];
+		int index1 = pIndices->data[0], index2 = pIndices->data[1], index3 = pIndices->data[2];
 		Vector3f E1 = ray.dir;
-		Vector3f E2 = cuboid.vertices[indices.data[0]] - cuboid.vertices[indices.data[1]];
-		Vector3f E3 = cuboid.vertices[indices.data[0]] - cuboid.vertices[indices.data[2]];
-		Vector3f E4 = cuboid.vertices[indices.data[0]] - ray.pos;
+		Vector3f E2 = cuboid.vertices[index1] - cuboid.vertices[index2];
+		Vector3f E3 = cuboid.vertices[index1] - cuboid.vertices[index3];
+		Vector3f E4 = cuboid.vertices[index1] - ray.pos;
 		float D1 = E4.x * E2.y * E3.z + E2.x * E3.y * E4.z + E3.x * E4.y * E2.z
 			- E3.x * E2.y * E4.z - E2.x * E4.y * E3.z - E4.x * E3.y * E2.z;
 		float D2 = E1.x * E4.y * E3.z + E4.x * E3.y * E1.z + E3.x * E1.y * E4.z
@@ -187,24 +191,62 @@ boolean intersect_Triangle(const Ray& ray) {
 		float t = D1;
 		float lamda = D2 / D;
 		float beita = D3 / D;
-		if (t > c2z && c2z < lamda && lamda < 1 && c2z < beita && beita < 1 && lamda+ beita<1)
+		if (t > c2z && c2z < lamda && lamda < 1 && c2z < beita && beita < 1 && lamda + beita < 1) {
+			float alpha = 1 - lamda - beita;
+			Vector3i* nIndices = &cuboid.normalsIndices[i];
+
+			intersect.pos = cuboid.vertices[index1] * alpha + cuboid.vertices[index2] * lamda + cuboid.vertices[index3] * beita;
+			intersect.normal = cuboid.normals[nIndices->x] * alpha + cuboid.normals[nIndices->y] * lamda + cuboid.normals[nIndices->z] * beita;
+			/*intersect.texel = cuboid.texels[index1] * t + cuboid.texels[index2] * lamda + cuboid.texels[index3] * beita;
+			intersect.tangent = cuboid.tangents[index1] * t + cuboid.tangents[index2] * lamda + cuboid.tangents[index3] * beita;
+			intersect.biTangent = cuboid.biTangents[index1] * t + cuboid.biTangents[index2] * lamda + cuboid.biTangents[index3] * beita;
+			*/
 			return true;
+		}
 	}
 	return false;
 }
 
-UINT32 castRay(const Ray& ray) {
-	if (intersect_Triangle(ray))
-		return ((int)122 << 16) + ((int)122 << 8) + 122;
-	else
-		return 0xffffffff;
+boolean shadow(const Ray& ray, const Light* light) {
+	return false;
 }
 
+UINT32 shade(const Ray& ray, Intersect& intersect) {
+	//todo 遍历光源
+	UINT32 res = 0x00000000;
+	for (auto light : lights) {
+		if (shadow(ray, light)) {
+
+		}
+		if (true)//matarial
+		{
+			//todo: 选择相应材质
+			res += Lambert::shade(ray, intersect, light);
+		}
+	}
+	return res;
+}
+
+UINT32 castRay(const Ray& ray) {
+	Intersect intersect;
+	if (intersect_Triangle(ray, intersect)) {
+		return shade(ray, intersect);
+	}
+	else
+		return 0x00000000;
+}
 
 
 int main(void)
 {
+	//初始化光源
+	Light light_a;
+	light_a.pos = { 5, 2.5, 5 };
+	light_a.color = { 255, 255, 255 };
+	lights.push_back(&light_a);
 
+
+	//初始化模型
 	buildMeshFromFile(cuboid, "Mesh/cuboid.obj");
 	buildMeshFromFile(plane, "Mesh/plane.obj");
 	cuboid.buildFacet();
@@ -252,7 +294,7 @@ int main(void)
 
 	while (1) {
 
-		t_start = GetTickCount();
+		t_start = GetTickCount64();
 
 		float half_h = tan(camera.verticalAngle) * camera.nearZ;
 		float half_w = tan(camera.laterialAngle) * camera.nearZ;
@@ -274,17 +316,15 @@ int main(void)
 					- downFactor * ((float)j / (float)window_height) - ray.pos;
 
 				ray.dir.normalized();
-				/*if (j == window_height -1) {
-					cout << j << "  " << i << endl;
-					showVector3(ray.dir);
-				}*/
+				
+				//todo: foreach light 微偏移
 				framebuffer[j][i] = castRay(ray);//((int)122 << 16) + ((int)122 << 8) + 122;
 			}
 		}
 
 		screen_update();
 
-		float shrub = (float)10000 / (GetTickCount() - t_start);
+		float shrub = (float)10000 / (GetTickCount64() - t_start);
 		cout << "帧数：" << shrub << endl;
 
 		Sleep(1);
