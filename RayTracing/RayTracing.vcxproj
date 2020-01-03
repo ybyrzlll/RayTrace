@@ -128,12 +128,14 @@
   <ItemGroup>
     <ClInclude Include="Camera.h" />
     <ClInclude Include="debugTool.h" />
+    <ClInclude Include="Global.h" />
     <ClInclude Include="light.h" />
     <ClInclude Include="mesh.h" />
     <ClInclude Include="mMath.h" />
     <ClInclude Include="objParser.h" />
     <ClInclude Include="Intersect.h" />
     <ClInclude Include="Shader.h" />
+    <ClInclude Include="Trace.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

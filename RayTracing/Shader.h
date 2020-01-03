@@ -3,6 +3,7 @@
 #include "mMath.h"
 #include "light.h"
 #include "Intersect.h"
+#include "Global.h"
 
 static UINT32 v3f_2_UINT32(Vector3f in) {
 	in.x = clamp(in.x, 0.0f, 255.0f);
@@ -13,9 +14,9 @@ static UINT32 v3f_2_UINT32(Vector3f in) {
 
 static class Lambert {
 public:
-	static UINT32 shade(const Ray& ray, Intersect& intersect, Light* light) {
-		float temp = ray.dir.dot(intersect.normal);
-		return v3f_2_UINT32(light->color * temp);
+	static Vector3f shade(const Ray& ray, const Intersect& intersect,const Light* light) {
+		float temp = max(0.0,ray.dir.dot(intersect.normal));
+		return light->color * temp;
 	}
 };
 

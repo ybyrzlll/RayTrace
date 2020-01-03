@@ -30,6 +30,13 @@ struct Vector3 {
 	{
 		return Vector3(x - rhs.x, y - rhs.y, z - rhs.z);
 	}
+	Vector3& operator += (const Vector3 rhs)
+	{
+		x += rhs.x;
+		y += rhs.y;
+		z += rhs.z;
+		return *this;
+	}
 	Vector3 operator * (const T a) const
 	{
 		return Vector3(x * a, y * a, z * a);
@@ -64,9 +71,14 @@ typedef Vector3<int> Vector3i;
 
 
 struct Ray {
-	Vector3<float> pos;
-	Vector3<float> dir;
+	Vector3f pos;
+	Vector3f dir;
 };
 
 template<typename T>
 static T clamp(T x, T min, T max) { return (x < min) ? min : ((x > max) ? max : x); }
+
+static Vector3f reflection(const Vector3f &normal, const Vector3f &in) {
+	Vector3f N = (in.dot(normal)) / normal.length();
+	return (N * 2 - in).normalized();
+}
