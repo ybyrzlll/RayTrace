@@ -15,7 +15,7 @@ static UINT32 v3f_2_UINT32(Vector3f in) {
 static class Lambert {
 public:
 	static Vector3f shade(const Ray& ray, const Intersect& intersect,const Light* light) {
-		float temp = max(0.0,ray.dir.dot(intersect.normal));
+		float temp = max(0.0,ray.dir.dot(-intersect.normal));
 		return light->color * temp;
 	}
 };

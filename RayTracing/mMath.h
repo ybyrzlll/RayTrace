@@ -42,6 +42,14 @@ struct Vector3 {
 		return Vector3(x * a, y * a, z * a);
 	}
 
+	Vector3& operator *= (const T a)
+	{
+		x *= a;
+		y *= a;
+		z *= a;
+		return *this;
+	}
+
 	T dot(const Vector3 rhs) const
 	{
 		return x * rhs.x + y * rhs.y + z * rhs.z;
@@ -82,3 +90,4 @@ static Vector3f reflection(const Vector3f &normal, const Vector3f &in) {
 	Vector3f N = (in.dot(normal)) / normal.length();
 	return (N * 2 - in).normalized();
 }
+

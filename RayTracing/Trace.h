@@ -16,6 +16,9 @@ namespace Trace {
 
 		static int count = 0;
 		count++;
+		int intersetNum = 0;
+
+		int twoFace = 0;
 
 		for (int i = 0; i < cuboid.numFaces; i++) {
 			
@@ -28,7 +31,7 @@ namespace Trace {
 			//Vector3f intersect_point = ray.dir * t + ray.pos;
 
 			Vector3i* pIndices = &cuboid.vertexIndices[i];
-			int index1 = pIndices->data[0], index2 = pIndices->data[1], index3 = pIndices->data[2];
+			int index1 = pIndices->data[0], index3 = pIndices->data[1], index2 = pIndices->data[2];
 			Vector3f E1 = ray.dir;
 			Vector3f E2 = cuboid.vertices[index1] - cuboid.vertices[index2];
 			Vector3f E3 = cuboid.vertices[index1] - cuboid.vertices[index3];
@@ -51,7 +54,9 @@ namespace Trace {
 				/*if(i<8 && i!=0 && i!=1)*/
 					//cout <<"count "<<count<<"  i  "<<i<<"  t"<< t << endl;
 
-				
+				intersetNum++;
+				if (intersetNum > 1)
+					cout << "intersect 2!!!" << endl;
 
 				float alpha = 1 - lamda - beita;
 				Vector3i* nIndices = &cuboid.normalsIndices[i];
@@ -64,6 +69,9 @@ namespace Trace {
 				*/
 
 				find = true;
+				twoFace++;
+				/*if(twoFace >1)
+					cout << "！！！！count " << count << "  i  " << i << "  t" << t << endl;*/
 			}
 		}
 
@@ -81,7 +89,7 @@ namespace Trace {
 	}
 
 	Vector3f shade(const Ray& ray, Intersect& intersect, const Light* light) {
-		//材质选择相应
+		//材质选择相应  { 255,255,255 };//
 		return Lambert::shade(ray, intersect, light);
 	}
 

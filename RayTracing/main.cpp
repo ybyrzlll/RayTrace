@@ -12,6 +12,7 @@
 #include "Shader.h"
 #include "Trace.h"
 #include "Global.h"
+#include "matrix.h"
 using namespace std;
 using namespace Trace;
 
@@ -193,7 +194,7 @@ int main(void)
 	//设置主相机
 	Camera camera;
 
-	camera.pos = { 0, 3, 2 };
+	camera.pos = { 2, 2, 2 };
 	camera.vpn = -camera.pos;
 	camera.vpn.normalized();
 	camera.up = { 0, 1, 0 };
@@ -251,6 +252,31 @@ int main(void)
 				framebuffer[j][i] = v3f_2_UINT32(castRay(ray));//((int)122 << 16) + ((int)122 << 8) + 122;
 			}
 		}
+
+		Vector3f camera_z = camera.vpn.crossProduct(camera.up);
+		camera_z.normalized();
+		camera_z *= Camera_Speed;
+
+		if (screen_keys[0x41]) camera.pos = camera.pos + camera_z;//a
+		if (screen_keys[0x44]) camera.pos = camera.pos - camera_z;//d
+
+		//camera.pos.x += 0.1f;//d
+		if (screen_keys[0x57]) camera.pos = camera.pos + camera.vpn;//w
+		if (screen_keys[0x53]) camera.pos = camera.pos - camera.vpn;//s
+
+		float thetaY = 0, thetaZ = 0;
+		if (screen_keys[VK_LEFT]) thetaY = -Camera_RotateSpeed;
+		if (screen_keys[VK_RIGHT]) thetaY = Camera_RotateSpeed;
+		if (screen_keys[VK_UP]) thetaZ = -Camera_RotateSpeed;
+		if (screen_keys[VK_DOWN]) thetaZ = Camera_RotateSpeed;
+
+		//乘以四元数旋转矩阵
+		Matrix4 m1, m2;
+		matrix_set_rotate(&m1, 0, 1, 0, thetaY);
+		if (camera.vpn.x > 0) matrix_set_rotate(&m2, 0, 0, -1, thetaZ);
+		else  matrix_set_rotate(&m2, 0, 0, 1, thetaZ);
+		camera.vpn = matrix_apply(m1, camera.vpn);
+		camera.vpn = matrix_apply(m2, camera.vpn);
 
 		screen_update();
 

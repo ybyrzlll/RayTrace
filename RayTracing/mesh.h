@@ -37,7 +37,7 @@ public:
 			GE.w = -vertices[indices.data[1]].x * N3.x - vertices[indices.data[1]].y * N3.y - vertices[indices.data[1]].x * N3.y;
 			fGeneralEquation.push_back(GE);
 			fNormals.push_back(N3);
-			showVector3(N3);
+			//showVector3(N3);
 		}
 	};
 };
