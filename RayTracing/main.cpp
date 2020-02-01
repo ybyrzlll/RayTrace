@@ -179,9 +179,13 @@ int main(void)
 
 	//初始化模型
 	buildMeshFromFile(cuboid, "Mesh/cuboid.obj");
-	//buildMeshFromFile(plane, "Mesh/plane.obj");
+	buildMeshFromFile(plane, "Mesh/plane.obj");
 	cuboid.buildFacet();
-	//plane.buildFacet();
+	plane.buildFacet();
+	cuboid.buildFacet();
+	meshs.push_back(&cuboid);
+	meshs.push_back(&plane);
+
 
 	int window_width = 400, window_height = 300;
 	//初始化窗口并设置标题
@@ -194,7 +198,7 @@ int main(void)
 	//设置主相机
 	Camera camera;
 
-	camera.pos = { 2, 2, 2 };
+	camera.pos = { 3, 3, 3 };
 	camera.vpn = -camera.pos;
 	camera.vpn.normalized();
 	camera.up = { 0, 1, 0 };
@@ -249,7 +253,7 @@ int main(void)
 				ray.dir.normalized();
 				
 				//todo: foreach light 微偏移
-				framebuffer[j][i] = v3f_2_UINT32(castRay(ray));//((int)122 << 16) + ((int)122 << 8) + 122;
+				framebuffer[j][i] = v3f_2_UINT32(castRay(ray, 0));//((int)122 << 16) + ((int)122 << 8) + 122;
 			}
 		}
 

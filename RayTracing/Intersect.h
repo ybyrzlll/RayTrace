@@ -1,6 +1,6 @@
 #pragma once
 #include "mMath.h"
-struct Intersect {
+struct Intersection {
 	Vector3f pos;
 	Vector3f normal;
 	Vector3f texel;
