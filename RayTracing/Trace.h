@@ -11,10 +11,9 @@ using namespace std;
 namespace Trace {
 
 
-	boolean intersect_Triangle(const Ray& ray, Intersection& intersection, Mesh* mesh) {
+	boolean intersect_Triangle(const Ray& ray, Intersection& intersection, Mesh* mesh, float &minZ) {
 
 		boolean find = false;
-		float minZ = FLT_MAX;
 
 		for (int i = 0; i < mesh->numFaces; i++) {
 			
@@ -27,7 +26,7 @@ namespace Trace {
 			//Vector3f intersect_point = ray.dir * t + ray.pos;
 
 			Vector3i* pIndices = &mesh->vertexIndices[i];
-			int index1 = pIndices->data[0], index3 = pIndices->data[1], index2 = pIndices->data[2];
+			int index1 = pIndices->data[0], index2 = pIndices->data[1], index3 = pIndices->data[2];
 			Vector3f E1 = ray.dir;
 			Vector3f E2 = mesh->vertices[index1] - mesh->vertices[index2];
 			Vector3f E3 = mesh->vertices[index1] - mesh->vertices[index3];
@@ -40,11 +39,11 @@ namespace Trace {
 				- E4.x * E2.y * E1.z - E2.x * E1.y * E4.z - E1.x * E4.y * E2.z;
 			float D = E1.x * E2.y * E3.z + E2.x * E3.y * E1.z + E3.x * E1.y * E2.z
 				- E3.x * E2.y * E1.z - E2.x * E1.y * E3.z - E1.x * E3.y * E2.z;
-			float t = D1;
+			float t = D1/D;
 			float lamda = D2 / D;
 			float beita = D3 / D;
-			//t<minZ 深度剔除 t<minZ &&
-			if ( t > c2z&& c2z < lamda && lamda < 1 && c2z < beita && beita < 1 && lamda + beita < 1) {
+			//minZ约束离ray最近的
+			if ( t > c2z&& c2z < lamda && lamda < 1 && c2z < beita && beita < 1 && lamda + beita < 1 && t<minZ) {
 				
 				minZ = t;
 				
@@ -70,16 +69,31 @@ namespace Trace {
 
 
 	boolean intersect(const Ray& ray, Intersection& intersection) {
+		float minZ = FLT_MAX;
+		boolean res = false;
 		for (Mesh* mesh : meshs) {
 			//TODO: 对比深度
-			if (intersect_Triangle(ray, intersection, mesh))
-				return true;
+			if (intersect_Triangle(ray, intersection, mesh, minZ))
+				res = true;
 		}
-		return false;
+		return res;
 	}
 
-	boolean shadow(const Ray& ray, const Light* light) {
-		return false;
+	boolean shadow(Intersection& intersection, const Light* light) {
+		Vector3f dir = light->pos - intersection.pos;
+		Ray ray(intersection.pos , dir);//+ Vector3f(0, 0.01, 0)
+		Intersection intersection2;
+		if (intersect(ray, intersection2)) {
+			// || intersection2.pos == intersection.pos
+			/*if (intersection.pos.y>0) {
+				showVector3(intersection.pos);
+				showVector3(intersection2.pos);
+				cout << "-----" << endl;
+			}*/
+			return true;
+		}
+		else
+			return false;
 	}
 
 	Vector3f shade(const Ray& ray, Intersection& intersection, const Light* light) {
@@ -89,36 +103,36 @@ namespace Trace {
 
 	Vector3f castRay(const Ray& ray, int times) {
 		Intersection intersection;
+		Vector3f res = { 0, 0, 0 };
 		if (intersect(ray, intersection)) {
 			//todo 遍历光源
-			Vector3f res = { 0, 0, 0 };
 			for (auto light : lights) 
 			{
-				if (shadow(ray, light)) {
-
-				}
-				if (true)//matarial
+				//阴影
+				//if (shadow(intersection, light)) {
+				//	//res += shade(ray, intersection, light);
+				//}
+				//else 
+					if (true)//matarial
 				{
 					res += shade(ray, intersection, light);
 				}
-				//反射
-				if (times< reflTimes && true) {
+
+				//间接反射
+				/*if (times< reflTimes && true) {
 					Vector3f refl = reflection(intersection.normal, ray.dir);
-					Ray ray2;
-					ray2.pos = intersection.pos;
-					ray2.dir = refl;
+					Ray ray2(intersection.pos, refl);
 					res += castRay(ray2, ++times) * reflFactor;
-				}
+				}*/
 
 				//todo: 折射
 			
 				
 			}
-			//todo 对光进行蒙特卡洛
-			return res;
+			
 		}
-		else
-			return { 0, 0, 0 };
+		//todo 对光进行蒙特卡洛
+		return res;
 	}
 }
 

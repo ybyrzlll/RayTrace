@@ -72,6 +72,12 @@ struct Vector3 {
 		z *= factor;
 		return *this;
 	}
+	boolean operator==(Vector3 rhs) const {
+		if (this->x == rhs.x && this->y == rhs.y && this->z == rhs.z)
+			return true;
+		else
+			return false;
+	}
 };
 
 typedef Vector3<float> Vector3f;
@@ -81,6 +87,8 @@ typedef Vector3<int> Vector3i;
 struct Ray {
 	Vector3f pos;
 	Vector3f dir;
+	Ray() {};
+	Ray(Vector3f p, Vector3f d) :pos(p), dir(d) {};
 };
 
 template<typename T>
