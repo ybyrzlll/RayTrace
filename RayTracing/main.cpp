@@ -172,7 +172,7 @@ int main(void)
 {
 	//初始化光源
 	Light light_a;
-	light_a.pos = { 1, 5, 1 };
+	light_a.pos = { 2, 5, 2 };
 	light_a.color = { 255, 255, 255 };
 	lights.push_back(&light_a);
 
@@ -198,7 +198,7 @@ int main(void)
 	//设置主相机
 	Camera camera;
 
-	camera.pos = { 3, 3, 3 };
+	camera.pos = { 3, 3, -3 };
 	camera.vpn = -camera.pos;
 
 	/*camera.pos = { -0.4, 1.7, 1.24 };

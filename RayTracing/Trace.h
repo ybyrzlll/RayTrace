@@ -26,7 +26,7 @@ namespace Trace {
 			//Vector3f intersect_point = ray.dir * t + ray.pos;
 
 			Vector3i* pIndices = &mesh->vertexIndices[i];
-			int index1 = pIndices->data[0], index2 = pIndices->data[1], index3 = pIndices->data[2];
+			int index1 = pIndices->data[0], index3 = pIndices->data[1], index2 = pIndices->data[2];
 			Vector3f E1 = ray.dir;
 			Vector3f E2 = mesh->vertices[index1] - mesh->vertices[index2];
 			Vector3f E3 = mesh->vertices[index1] - mesh->vertices[index3];
@@ -42,7 +42,7 @@ namespace Trace {
 			float t = D1/D;
 			float lamda = D2 / D;
 			float beita = D3 / D;
-			//minZ约束离ray最近的
+			//minZ约束离光线最近的
 			if ( t > c2z&& c2z < lamda && lamda < 1 && c2z < beita && beita < 1 && lamda + beita < 1 && t<minZ) {
 				
 				minZ = t;
@@ -57,8 +57,8 @@ namespace Trace {
 				intersect.biTangent = cuboid.biTangents[index1] * t + cuboid.biTangents[index2] * lamda + cuboid.biTangents[index3] * beita;
 				*/
 
-				//find = true;
-				return true;
+				find = true;
+				//return true;
 				/*if(twoFace >1)
 					cout << "！！！！count " << count << "  i  " << i << "  t" << t << endl;*/
 			}
@@ -109,10 +109,10 @@ namespace Trace {
 			for (auto light : lights) 
 			{
 				//阴影
-				//if (shadow(intersection, light)) {
-				//	//res += shade(ray, intersection, light);
-				//}
-				//else 
+				if (shadow(intersection, light)) {
+					//res += shade(ray, intersection, light);
+				}
+				else 
 					if (true)//matarial
 				{
 					res += shade(ray, intersection, light);
