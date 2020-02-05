@@ -43,7 +43,7 @@ namespace Trace {
 			float lamda = D2 / D;
 			float beita = D3 / D;
 			//minZ约束离光线最近的
-			if ( t > c2z&& c2z < lamda && lamda < 1 && c2z < beita && beita < 1 && lamda + beita < 1 && t<minZ) {
+			if ( t > c2z&& c2z < lamda && lamda <= 1 && c2z < beita && beita <= 1 && lamda + beita <= 1 && t<minZ) {
 				
 				minZ = t;
 				
