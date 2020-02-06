@@ -175,7 +175,7 @@ int main(void)
 	//初始化光源
 	Light light_a;
 	light_a.pos = { 2, 5, 2 };
-	light_a.color = { 255, 255, 255 };
+	light_a.color = { 1, 1, 1 };
 	lights.push_back(&light_a);
 
 

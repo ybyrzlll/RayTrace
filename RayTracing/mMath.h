@@ -30,6 +30,10 @@ struct Vector3 {
 	{
 		return Vector3(x - rhs.x, y - rhs.y, z - rhs.z);
 	}
+	Vector3 operator * (const Vector3 rhs)const
+	{
+		return Vector3(rhs.x * x, rhs.y * y, rhs.z * z);
+	}
 	Vector3& operator += (const Vector3 rhs)
 	{
 		x += rhs.x;
@@ -37,6 +41,8 @@ struct Vector3 {
 		z += rhs.z;
 		return *this;
 	}
+	
+
 	Vector3 operator * (const T a) const
 	{
 		return Vector3(x * a, y * a, z * a);
