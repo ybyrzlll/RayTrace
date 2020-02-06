@@ -38,9 +38,6 @@
     <ClInclude Include="light.h">
       <Filter>源文件</Filter>
     </ClInclude>
-    <ClInclude Include="Intersect.h">
-      <Filter>源文件</Filter>
-    </ClInclude>
     <ClInclude Include="Shader.h">
       <Filter>源文件</Filter>
     </ClInclude>
@@ -51,6 +48,15 @@
       <Filter>源文件</Filter>
     </ClInclude>
     <ClInclude Include="matrix.h">
+      <Filter>源文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Matarial.h">
+      <Filter>源文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Obj.h">
+      <Filter>源文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Intersection.h">
       <Filter>源文件</Filter>
     </ClInclude>
   </ItemGroup>

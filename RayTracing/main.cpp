@@ -1,18 +1,20 @@
 #include <windows.h>
 #include <tchar.h>
-#include "mesh.h"
+
 #include "objParser.h"
-#include "mesh.h"
-#include "Camera.h"
 #include "debugTool.h"
 
 #include <iostream>
-#include "Intersect.h"
+#include "mMath.h"
+#include "Obj.h"
+#include "Intersection.h"
+#include "mesh.h"
 #include "light.h"
 #include "Shader.h"
 #include "Trace.h"
 #include "Global.h"
 #include "matrix.h"
+#include "Camera.h"
 using namespace std;
 using namespace Trace;
 
@@ -178,13 +180,33 @@ int main(void)
 
 
 	//初始化模型
-	buildMeshFromFile(cuboid, "Mesh/cuboid.obj");
-	buildMeshFromFile(plane, "Mesh/plane.obj");
-	cuboid.buildFacet();
-	plane.buildFacet();
-	cuboid.buildFacet();
-	meshs.push_back(&cuboid);
-	meshs.push_back(&plane);
+		//初始化材质
+		Matarial mt_cuboid, mt_plane;
+		mt_cuboid.color = { 255, 0, 255 };
+		mt_plane.color = { 0, 255, 255 };
+			
+
+		//初始化网格
+		Mesh mesh_cuboid, mesh_plane;
+		buildMeshFromFile(mesh_cuboid, "Mesh/cuboid.obj");
+		buildMeshFromFile(mesh_plane, "Mesh/plane.obj");
+		mesh_cuboid.buildFacet();
+		mesh_plane.buildFacet();
+
+		//使用的shader
+		Lambert lambert;
+
+		Obj cuboid, plane;
+		cuboid.mesh = &mesh_cuboid;
+		cuboid.matarial = &mt_cuboid;
+		cuboid.shader = &lambert;
+		
+		plane.mesh = &mesh_plane;
+		plane.matarial = &mt_plane;
+		plane.shader = &lambert;
+
+		objs.push_back(&cuboid);
+		objs.push_back(&plane);
 
 
 	int window_width = 400, window_height = 300;

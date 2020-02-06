@@ -1,5 +1,7 @@
 #pragma once
-#include "mMath.h"
+#include"mMath.h"
+#include "Obj.h"
+
 struct Intersection {
 	Vector3f pos;
 	Vector3f normal;

@@ -1,20 +1,24 @@
 #pragma once
 #include <iostream>
-#include "mMath.h"
 #include "light.h"
-#include "Intersect.h"
-#include "Global.h"
+#include "Matarial.h"
+#include "Intersection.h"
 
-static UINT32 v3f_2_UINT32(Vector3f in) {
-	in.x = clamp(in.x, 0.0f, 255.0f);
-	in.y = clamp(in.y, 0.0f, 255.0f);
-	in.z = clamp(in.z, 0.0f, 255.0f);
-	return ((int)in.x << 16) + ((int)in.y << 8) + in.z;
-}
-
-static class Lambert {
+class BaseShader {
 public:
-	static Vector3f shade(const Ray& ray, const Intersection& intersection,const Light* light) {
+	virtual ~BaseShader() {};
+	//virtual Vector3f ashade(const Ray& ray, const Intersection& intersection, const Light* light) = 0;
+	virtual Vector3f shade(const Ray& ray, const Intersection& intersection, const Light* light, const Matarial* mt) = 0;
+};
+
+class Lambert : public BaseShader {
+public:
+	Vector3f rgb = { 255, 255, 255 };
+	/*Vector3f ashade(const Ray& ray, const Intersection& intersection, const Light* light) override {
+		float temp = max(0.0, ray.dir.dot(-intersection.normal));
+		return light->color * temp;
+	}*/
+	Vector3f shade(const Ray& ray, const Intersection& intersection, const Light* light, const Matarial* mt) override {
 		float temp = max(0.0, ray.dir.dot(-intersection.normal));
 		return light->color * temp;
 	}

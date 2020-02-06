@@ -2,9 +2,8 @@
 
 #include<iostream>
 #include "mMath.h"
-#include "Intersect.h"
-#include "light.h"
-#include "Shader.h"
+#include "Obj.h"
+#include "Global.h"
 
 using namespace std;
 
@@ -16,14 +15,6 @@ namespace Trace {
 		boolean find = false;
 
 		for (int i = 0; i < mesh->numFaces; i++) {
-			
-
-			////求交点
-			//Vector3f GE = cuboid.fGeneralEquation[i];
-			//float t = (-GE.w - GE.x * ray.pos.x - GE.y * ray.pos.y - GE.z * ray.pos.z) /
-			//	(GE.x * ray.dir.x + GE.y * ray.dir.y + GE.z * ray.dir.z);
-			//if (t < 0) continue;
-			//Vector3f intersect_point = ray.dir * t + ray.pos;
 
 			Vector3i* pIndices = &mesh->vertexIndices[i];
 			int index1 = pIndices->data[0], index3 = pIndices->data[1], index2 = pIndices->data[2];
@@ -68,13 +59,14 @@ namespace Trace {
 	}
 
 
-	boolean intersect(const Ray& ray, Intersection& intersection) {
+	boolean intersect(const Ray& ray, Intersection& intersection, Obj** object) {
 		float minZ = FLT_MAX;
 		boolean res = false;
-		for (Mesh* mesh : meshs) {
-			//TODO: 对比深度
-			if (intersect_Triangle(ray, intersection, mesh, minZ))
+		for (auto obj : objs) {
+			if (intersect_Triangle(ray, intersection, obj->mesh, minZ)) {
+				*object = (Obj *)obj;
 				res = true;
+			}
 		}
 		return res;
 	}
@@ -83,7 +75,8 @@ namespace Trace {
 		Vector3f dir = light->pos - intersection.pos;
 		Ray ray(intersection.pos , dir);//+ Vector3f(0, 0.01, 0)
 		Intersection intersection2;
-		if (intersect(ray, intersection2)) {
+		Obj* object = nullptr;
+		if (intersect(ray, intersection2, &object)) {
 			// || intersection2.pos == intersection.pos
 			/*if (intersection.pos.y>0) {
 				showVector3(intersection.pos);
@@ -96,15 +89,16 @@ namespace Trace {
 			return false;
 	}
 
-	Vector3f shade(const Ray& ray, Intersection& intersection, const Light* light) {
-		//材质选择相应  { 255,255,255 };//
-		return Lambert::shade(ray, intersection, light);
-	}
+	//Vector3f shade(const Ray& ray, Intersection& intersection, const Light* light) {
+	//	//材质选择相应  { 255,255,255 };//
+	//	return intersection.obj->matarial->shader->shade(ray, intersection, light);
+	//}
 
 	Vector3f castRay(const Ray& ray, int times) {
 		Intersection intersection;
+		Obj* object = nullptr;
 		Vector3f res = { 0, 0, 0 };
-		if (intersect(ray, intersection)) {
+		if (intersect(ray, intersection, &object)) {
 			//todo 遍历光源
 			for (auto light : lights) 
 			{
@@ -112,10 +106,10 @@ namespace Trace {
 				if (shadow(intersection, light)) {
 					//res += shade(ray, intersection, light);
 				}
-				else 
-					if (true)//matarial
+				else if (true)//matarial
 				{
-					res += shade(ray, intersection, light);
+					string sad = "fasdf";
+					res += object->shader->shade(ray, intersection, light, object->matarial);//(ray, intersection, light);
 				}
 
 				//间接反射

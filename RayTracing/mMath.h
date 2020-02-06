@@ -91,6 +91,10 @@ struct Ray {
 	Ray(Vector3f p, Vector3f d) :pos(p), dir(d) {};
 };
 
+
+
+
+
 template<typename T>
 static T clamp(T x, T min, T max) { return (x < min) ? min : ((x > max) ? max : x); }
 
@@ -99,3 +103,9 @@ static Vector3f reflection(const Vector3f &normal, const Vector3f &in) {
 	return (N * 2 - in).normalized();
 }
 
+static UINT32 v3f_2_UINT32(Vector3f in) {
+	in.x = clamp(in.x, 0.0f, 255.0f);
+	in.y = clamp(in.y, 0.0f, 255.0f);
+	in.z = clamp(in.z, 0.0f, 255.0f);
+	return ((int)in.x << 16) + ((int)in.y << 8) + in.z;
+}
