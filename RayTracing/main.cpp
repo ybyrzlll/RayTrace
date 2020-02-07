@@ -183,8 +183,9 @@ int main(void)
 		//初始化材质
 		Matarial mt_cuboid, mt_plane;
 		mt_cuboid.color = { 255, 0, 255 };
-		mt_plane.color = { 0, 255, 255 };
-			
+		mt_cuboid.reflFactor = 0.01;
+		mt_plane.color = { 100, 100, 100 };
+		mt_plane.reflFactor = 0.7;
 
 		//初始化网格
 		Mesh mesh_cuboid, mesh_plane;
@@ -220,7 +221,7 @@ int main(void)
 	//设置主相机
 	Camera camera;
 
-	camera.pos = { 3, 3, -3 };
+	camera.pos = { 3, 3, 3 };
 	camera.vpn = -camera.pos;
 
 	/*camera.pos = { -0.4, 1.7, 1.24 };

@@ -103,21 +103,22 @@ namespace Trace {
 			for (auto light : lights) 
 			{
 				//阴影
-				if (shadow(intersection, light)) {
-					//res += shade(ray, intersection, light);
-				}
-				else if (true)//matarial
+				//if (shadow(intersection, light)) {
+				//	//res += shade(ray, intersection, light);
+				//}
+				//else 
+					if (true)//matarial
 				{
-					string sad = "fasdf";
 					res += object->shader->shade(ray, intersection, light, object->matarial);//(ray, intersection, light);
 				}
 
 				//间接反射
-				/*if (times< reflTimes && true) {
+				if (times< reflTimes && true) {
 					Vector3f refl = reflection(intersection.normal, ray.dir);
 					Ray ray2(intersection.pos, refl);
-					res += castRay(ray2, ++times) * reflFactor;
-				}*/
+					Vector3f temp = castRay(ray2, ++times)*object->matarial->reflFactor;
+					res += temp;
+				}
 
 				//todo: 折射
 			
