@@ -126,7 +126,7 @@
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Camera.h" />
+    <ClInclude Include="Camera.hpp" />
     <ClInclude Include="debugTool.h" />
     <ClInclude Include="Global.h" />
     <ClInclude Include="Intersection.h" />
@@ -137,6 +137,8 @@
     <ClInclude Include="mMath.h" />
     <ClInclude Include="Obj.h" />
     <ClInclude Include="objParser.h" />
+    <ClInclude Include="Sampler.hpp" />
+    <ClInclude Include="Sampler_halton.hpp" />
     <ClInclude Include="Shader.h" />
     <ClInclude Include="Trace.h" />
   </ItemGroup>

@@ -4,13 +4,14 @@
 #include "mMath.h"
 #include "Obj.h"
 #include "Global.h"
+#include "Camera.hpp"
 
 using namespace std;
 
 namespace Trace {
 
 
-	boolean intersect_Triangle(const Ray& ray, Intersection& intersection, Mesh* mesh, float &minZ) {
+	boolean intersect_Triangle(const Ray& ray, Intersection& intersection, Mesh* mesh, float& minZ) {
 
 		boolean find = false;
 
@@ -30,14 +31,14 @@ namespace Trace {
 				- E4.x * E2.y * E1.z - E2.x * E1.y * E4.z - E1.x * E4.y * E2.z;
 			float D = E1.x * E2.y * E3.z + E2.x * E3.y * E1.z + E3.x * E1.y * E2.z
 				- E3.x * E2.y * E1.z - E2.x * E1.y * E3.z - E1.x * E3.y * E2.z;
-			float t = D1/D;
+			float t = D1 / D;
 			float lamda = D2 / D;
 			float beita = D3 / D;
 			//minZ约束离光线最近的
-			if ( t > c2z&& c2z < lamda && lamda <= 1 && c2z < beita && beita <= 1 && lamda + beita <= 1 && t<minZ) {
-				
+			if (t > c2z&& c2z < lamda && lamda <= 1 && c2z < beita && beita <= 1 && lamda + beita <= 1 && t < minZ) {
+
 				minZ = t;
-				
+
 				float alpha = 1 - lamda - beita;
 				Vector3i* nIndices = &mesh->normalsIndices[i];
 
@@ -64,7 +65,7 @@ namespace Trace {
 		boolean res = false;
 		for (auto obj : objs) {
 			if (intersect_Triangle(ray, intersection, obj->mesh, minZ)) {
-				*object = (Obj *)obj;
+				*object = (Obj*)obj;
 				res = true;
 			}
 		}
@@ -73,7 +74,7 @@ namespace Trace {
 
 	boolean shadow(Intersection& intersection, const Light* light) {
 		Vector3f dir = light->pos - intersection.pos;
-		Ray ray(intersection.pos , dir);//+ Vector3f(0, 0.01, 0)
+		Ray ray(intersection.pos, dir);//+ Vector3f(0, 0.01, 0)
 		Intersection intersection2;
 		Obj* object = nullptr;
 		if (intersect(ray, intersection2, &object)) {
@@ -100,34 +101,48 @@ namespace Trace {
 		Vector3f res = { 0, 0, 0 };
 		if (intersect(ray, intersection, &object)) {
 			//todo 遍历光源
-			for (auto light : lights) 
+			for (auto light : lights)
 			{
 				//阴影
 				//if (shadow(intersection, light)) {
 				//	//res += shade(ray, intersection, light);
 				//}
 				//else 
-					if (true)//matarial
+				if (true)//matarial
 				{
 					res += object->shader->shade(ray, intersection, light, object->matarial);//(ray, intersection, light);
 				}
 
 				//间接反射
-				if (times< reflTimes && true) {
+				if (times < reflTimes && true) {
 					Vector3f refl = reflection(intersection.normal, ray.dir);
 					Ray ray2(intersection.pos, refl);
-					Vector3f temp = castRay(ray2, ++times)*object->matarial->reflFactor;
+					Vector3f temp = castRay(ray2, ++times) * object->matarial->reflFactor;
 					res += temp;
 				}
 
 				//todo: 折射
-			
-				
+
+
 			}
-			
+
 		}
 		//todo 对光进行蒙特卡洛
 		return res;
+	}
+
+	Ray generateRay(float j, float i, Camera& camera) {
+		Ray ray;
+		ray.pos = camera.pos;
+
+		ray.dir = camera.pos_begin + camera.rightFactor * ((float)i / (float)window_width)
+			- camera.downFactor * ((float)j / (float)window_height) - ray.pos;
+		ray.dir.normalized();
+
+		//showVector3(ray.pos);
+		//showVector3(ray.dir);
+
+		return ray;
 	}
 }
 

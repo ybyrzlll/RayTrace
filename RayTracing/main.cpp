@@ -14,7 +14,7 @@
 #include "Trace.h"
 #include "Global.h"
 #include "matrix.h"
-#include "Camera.h"
+#include "Camera.hpp"
 using namespace std;
 using namespace Trace;
 
@@ -210,7 +210,6 @@ int main(void)
 		objs.push_back(&plane);
 
 
-	int window_width = 400, window_height = 300;
 	//初始化窗口并设置标题
 	char text[] = _T("YeahBin (software render ) - ");
 	TCHAR* title = text;
@@ -258,27 +257,12 @@ int main(void)
 
 		t_start = GetTickCount64();
 
-		float half_h = tan(camera.verticalAngle) * camera.nearZ;
-		float half_w = tan(camera.laterialAngle) * camera.nearZ;
-
-		Vector3f rightDir = (camera.up.crossProduct(camera.vpn)).normalized();
-		Vector3f upDir = (camera.vpn.crossProduct(rightDir)).normalized();
-		Vector3f pos_begin = camera.pos + camera.vpn.normalized() * camera.nearZ
-			+ upDir * half_h - rightDir * half_w;
-		Vector3f rightFactor = rightDir * half_w * 2;
-		Vector3f downFactor = upDir * half_h * 2;
-
-		Ray ray;
-		ray.pos = camera.pos;
+		camera.refresh();
 
 		for (int j = 0; j < window_height; j++) {
 			for (int i = 0; i < window_width; i++)
 			{
-				ray.dir = pos_begin + rightFactor * ((float)i / (float)window_width)
-					- downFactor * ((float)j / (float)window_height) - ray.pos;
-
-				ray.dir.normalized();
-				
+				Ray ray = generateRay((float)j, (float)i, camera);
 				//todo: foreach light 微偏移
 				framebuffer[j][i] = v3f_2_UINT32(castRay(ray, 0));//((int)122 << 16) + ((int)122 << 8) + 122;
 			}
