@@ -126,6 +126,8 @@
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="AABB.hpp" />
+    <ClInclude Include="BoundingBox.hpp" />
     <ClInclude Include="Camera.hpp" />
     <ClInclude Include="debugTool.h" />
     <ClInclude Include="Global.h" />
@@ -135,7 +137,7 @@
     <ClInclude Include="matrix.h" />
     <ClInclude Include="mesh.h" />
     <ClInclude Include="mMath.h" />
-    <ClInclude Include="Obj.h" />
+    <ClInclude Include="Obj.hpp" />
     <ClInclude Include="objParser.h" />
     <ClInclude Include="Sampler.hpp" />
     <ClInclude Include="Sampler_halton.hpp" />

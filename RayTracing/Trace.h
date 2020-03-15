@@ -2,7 +2,7 @@
 
 #include<iostream>
 #include "mMath.h"
-#include "Obj.h"
+#include "Obj.hpp"
 #include "Global.h"
 #include "Camera.hpp"
 
@@ -64,9 +64,12 @@ namespace Trace {
 		float minZ = FLT_MAX;
 		boolean res = false;
 		for (auto obj : objs) {
-			if (intersect_Triangle(ray, intersection, obj->mesh, minZ)) {
-				*object = (Obj*)obj;
-				res = true;
+			if (obj->boundingBox->intersect(ray))
+			{
+				if (intersect_Triangle(ray, intersection, obj->mesh, minZ)) {
+					*object = (Obj*)obj;
+					res = true;
+				}
 			}
 		}
 		return res;

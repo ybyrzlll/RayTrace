@@ -50,9 +50,6 @@
     <ClInclude Include="Matarial.h">
       <Filter>源文件</Filter>
     </ClInclude>
-    <ClInclude Include="Obj.h">
-      <Filter>源文件</Filter>
-    </ClInclude>
     <ClInclude Include="Intersection.h">
       <Filter>源文件</Filter>
     </ClInclude>
@@ -63,6 +60,15 @@
       <Filter>源文件</Filter>
     </ClInclude>
     <ClInclude Include="Camera.hpp">
+      <Filter>源文件</Filter>
+    </ClInclude>
+    <ClInclude Include="BoundingBox.hpp">
+      <Filter>源文件</Filter>
+    </ClInclude>
+    <ClInclude Include="AABB.hpp">
+      <Filter>源文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Obj.hpp">
       <Filter>源文件</Filter>
     </ClInclude>
   </ItemGroup>

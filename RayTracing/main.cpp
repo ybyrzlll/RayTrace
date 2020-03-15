@@ -6,7 +6,7 @@
 
 #include <iostream>
 #include "mMath.h"
-#include "Obj.h"
+#include "Obj.hpp"
 #include "Intersection.h"
 #include "mesh.h"
 #include "light.h"
@@ -178,7 +178,6 @@ int main(void)
 	light_a.color = { 1, 1, 1 };
 	lights.push_back(&light_a);
 
-
 	//初始化模型
 		//初始化材质
 		Matarial mt_cuboid, mt_plane;
@@ -189,8 +188,9 @@ int main(void)
 
 		//初始化网格
 		Mesh mesh_cuboid, mesh_plane;
-		buildMeshFromFile(mesh_cuboid, "Mesh/cuboid.obj");
+		buildMeshFromFile(mesh_cuboid, "Mesh/cuboid.obj");//Lemonade_Can.obj");
 		buildMeshFromFile(mesh_plane, "Mesh/plane.obj");
+		//mesh_cuboid.Zoom(25);
 		mesh_cuboid.buildFacet();
 		mesh_plane.buildFacet();
 
@@ -209,6 +209,10 @@ int main(void)
 		objs.push_back(&cuboid);
 		objs.push_back(&plane);
 
+		//生成AABB包围盒
+		for (auto obj : objs)
+			obj->buildAABB();
+
 
 	//初始化窗口并设置标题
 	char text[] = _T("YeahBin (software render ) - ");
@@ -220,7 +224,7 @@ int main(void)
 	//设置主相机
 	Camera camera;
 
-	camera.pos = { 3, 3, 3 };
+	camera.pos = { 3, 3, -3 };
 	camera.vpn = -camera.pos;
 
 	/*camera.pos = { -0.4, 1.7, 1.24 };
@@ -260,6 +264,8 @@ int main(void)
 		camera.refresh();
 
 		for (int j = 0; j < window_height; j++) {
+			printf("\r");
+			printf("Rendering  %d % ------ ", 100 * j / (window_height)+1);
 			for (int i = 0; i < window_width; i++)
 			{
 				Ray ray = generateRay((float)j, (float)i, camera);
@@ -296,7 +302,7 @@ int main(void)
 		screen_update();
 
 		float shrub = (float)10000 / (GetTickCount64() - t_start);
-		cout << "帧数：" << shrub << " ----------------------------------------"<<endl;
+		cout << "帧数：" << shrub << " --------------  耗时ms:"<< GetTickCount64() - t_start <<endl;
 
 		Sleep(1);
 	}

@@ -1,6 +1,6 @@
 #pragma once
 #include"mMath.h"
-#include "Obj.h"
+#include "Obj.hpp"
 
 struct Intersection {
 	Vector3f pos;

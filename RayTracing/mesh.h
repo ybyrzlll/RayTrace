@@ -40,6 +40,14 @@ public:
 			//showVector3(N3);
 		}
 	};
+
+	void Zoom(double ratio) {
+		for (Vector3f &v : vertices) {
+			v.x *= ratio;
+			v.y *= ratio;
+			v.z *= ratio;
+		}
+	}
 };
 
 #endif
