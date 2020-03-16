@@ -184,7 +184,7 @@ int main(void)
 		mt_cuboid.color = { 255, 0, 255 };
 		mt_cuboid.reflFactor = 0.01;
 		mt_plane.color = { 100, 100, 100 };
-		mt_plane.reflFactor = 0.7;
+		mt_plane.reflFactor = 0.4;
 
 		//初始化网格
 		Mesh mesh_cuboid, mesh_plane;
@@ -205,18 +205,19 @@ int main(void)
 		plane1.mesh = &mesh_plane;
 		plane1.matarial = &mt_plane;
 		plane1.shader = &lambert;
+		plane1.translate(Vector3f(0, -2, 0));
 
 		plane2.mesh = &mesh_plane;
 		plane2.matarial = &mt_plane;
 		plane2.shader = &lambert;
 		plane2.rotate(Vector3f(1, 0, 0), pi / 2);
-		plane2.translate(Vector3f(0, 1, -3));
+		plane2.translate(Vector3f(0, -2, -4));
 
 		plane3.mesh = &mesh_plane;
 		plane3.matarial = &mt_plane;
 		plane3.shader = &lambert;
 		plane3.rotate(Vector3f(0, 0, 1), pi / 2);
-		plane3.translate(Vector3f(-3, 1, 0));
+		plane3.translate(Vector3f(-4, -2, 0));
 
 		objs.push_back(&cuboid);
 		objs.push_back(&plane1);
@@ -317,13 +318,14 @@ int main(void)
 		//camera.vpn = matrix_apply(m1, camera.vpn);
 		//camera.vpn = matrix_apply(m2, camera.vpn);
 
+		//自动旋转
 		float diff = GetTickCount64() - t_start;
-		float speed = Camera_RotateSpeed;
-		theta += speed * diff/30;
-		theta = fmod(theta, 2*pi);
+		/*float speed = Camera_RotateSpeed;
+		theta += speed * diff / 30;
+		theta = fmod(theta, 2 * pi);
 		camera.pos.x = R * sin(theta);
 		camera.pos.z = R * cos(theta);
-		camera.vpn = -camera.pos;
+		camera.vpn = -camera.pos;*/
 
 		screen_update();
 

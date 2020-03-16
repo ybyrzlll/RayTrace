@@ -47,8 +47,9 @@ namespace Trace {
 				Vector3i* nIndices = &mesh->normalsIndices[i];
 
 				intersection.pos = P1 * alpha + P2 * lamda + P3 * beita;
-				intersection.normal = mesh->normals[nIndices->x] * alpha + mesh->normals[nIndices->y] * lamda + mesh->normals[nIndices->z] * beita;
-				intersection.normal = matrix_mul(object->transform, intersection.normal);
+				intersection.normal = matrix_mul(object->transform, mesh->normals[nIndices->x]) * alpha 
+					+ matrix_mul(object->transform, mesh->normals[nIndices->y]) * lamda
+					+ matrix_mul(object->transform, mesh->normals[nIndices->z]) * beita;
 				/*intersect.texel = cuboid.texels[index1] * t + cuboid.texels[index2] * lamda + cuboid.texels[index3] * beita;
 				intersect.tangent = cuboid.tangents[index1] * t + cuboid.tangents[index2] * lamda + cuboid.tangents[index3] * beita;
 				intersect.biTangent = cuboid.biTangents[index1] * t + cuboid.biTangents[index2] * lamda + cuboid.biTangents[index3] * beita;
@@ -80,7 +81,7 @@ namespace Trace {
 		return res;
 	}
 
-	boolean shadow(Intersection& intersection, const Light* light) {
+	boolean shadowRay(Intersection& intersection, const Light* light) {
 		Vector3f dir = light->pos - intersection.pos;
 		Ray ray(intersection.pos, dir);//+ Vector3f(0, 0.01, 0)
 		Intersection intersection2;
@@ -111,8 +112,8 @@ namespace Trace {
 			//todo 遍历光源
 			for (auto light : lights)
 			{
-				//阴影
-				//if (shadow(intersection, light)) {
+				//阴影射线
+				//if (shadowRay(intersection, light)) {
 				//	//res += shade(ray, intersection, light);
 				//}
 				//else 
@@ -121,19 +122,19 @@ namespace Trace {
 					res += object->shader->shade(ray, intersection, light, object->matarial);//(ray, intersection, light);
 				}
 
-				//间接反射
-				if (times < reflTimes && true) {
-					Vector3f refl = reflection(intersection.normal, ray.dir);
-					Ray ray2(intersection.pos, refl);
-					Vector3f temp = castRay(ray2, ++times) * object->matarial->reflFactor;
-					res += temp;
-				}
-
-				//todo: 折射
-
-
 			}
 
+			//间接光照
+
+			//反射
+			if (times < reflTimes && true) {
+				Vector3f refl = reflection(intersection.normal, ray.dir);
+				Ray ray2(intersection.pos, refl);
+				Vector3f temp = castRay(ray2, ++times) * object->matarial->reflFactor;
+				res += temp;
+			}
+
+			//todo: 折射
 		}
 		//todo 对光进行蒙特卡洛
 		return res;
