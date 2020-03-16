@@ -4,17 +4,21 @@
 #include "mMath.h"
 #include "Shader.h"
 #include "AABB.hpp"
+#include "matrix.h"
 
 struct Obj {
 public:
-	Vector3f transform;
-	Mesh* mesh;
+	Matrix4 transform;
+	Mesh *mesh;
 	Matarial* matarial;
 	BaseShader* shader;
 
 	BoundingBox *boundingBox;
 	
-	Obj() {};
+	Obj() {
+		for (int i = 0; i < 4; i++)
+			transform.m[i][i] = 1;
+	};
 	~Obj() {};
 
 	void buildAABB() {
@@ -32,5 +36,15 @@ public:
 		//showVector3(minP);
 		//showVector3(maxP);
 		this->boundingBox = new AABB(minP, maxP);
+	}
+
+
+	void Zoom(double ratio) {
+		for (int i = 0; i < 4; i++)
+			transform.m[i][i] *= ratio;
+	}
+
+	void Rotate() {
+
 	}
 };

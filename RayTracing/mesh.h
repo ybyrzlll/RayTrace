@@ -41,13 +41,6 @@ public:
 		}
 	};
 
-	void Zoom(double ratio) {
-		for (Vector3f &v : vertices) {
-			v.x *= ratio;
-			v.y *= ratio;
-			v.z *= ratio;
-		}
-	}
 };
 
 #endif

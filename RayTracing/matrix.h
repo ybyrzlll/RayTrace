@@ -3,7 +3,11 @@
 struct Matrix4//[列][行]
 {
 	float m[4][4];
-	Matrix4() {};
+	Matrix4() {
+		for (int rows = 0; rows < 4; ++rows)
+			for (int cols = 0; cols < 4; ++cols)
+				m[rows][cols] = 0;
+	};
 	Matrix4 operator* (Matrix4& rhs) {
 		//Matrix dimensions
 		Matrix4 results;
@@ -30,7 +34,7 @@ struct Matrix4//[列][行]
 }; 
 
 // y = x * m 能够用于自身
-static Vector3f  matrix_apply(const Matrix4& m, const Vector3f& x) {
+static Vector3f  matrix_mul(const Matrix4& m, const Vector3f& x) {
 	float X = x.x, Y = x.y, Z = x.z, W = x.w;
 	Vector3f y;
 	y.x = X * m.m[0][0] + Y * m.m[1][0] + Z * m.m[2][0] + W * m.m[3][0];

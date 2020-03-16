@@ -11,18 +11,22 @@ using namespace std;
 namespace Trace {
 
 
-	boolean intersect_Triangle(const Ray& ray, Intersection& intersection, Mesh* mesh, float& minZ) {
+	boolean intersect_Triangle(const Ray& ray, Intersection& intersection, Obj* object, float& minZ) {
 
 		boolean find = false;
+		Mesh *mesh = object->mesh;
 
 		for (int i = 0; i < mesh->numFaces; i++) {
 
 			Vector3i* pIndices = &mesh->vertexIndices[i];
 			int index1 = pIndices->data[0], index3 = pIndices->data[1], index2 = pIndices->data[2];
-			Vector3f E1 = ray.dir;
-			Vector3f E2 = mesh->vertices[index1] - mesh->vertices[index2];
-			Vector3f E3 = mesh->vertices[index1] - mesh->vertices[index3];
-			Vector3f E4 = mesh->vertices[index1] - ray.pos;
+			Vector3f P1 = matrix_mul(object->transform, mesh->vertices[index1]),
+				P2 = matrix_mul(object->transform, mesh->vertices[index2]), 
+				P3 = matrix_mul(object->transform, mesh->vertices[index3]);
+			Vector3f E1 = ray.dir,
+				E2 = P1 - P2 ,
+				E3 = P1 - P3 ,
+				E4 = P1 - ray.pos;
 			float D1 = E4.x * E2.y * E3.z + E2.x * E3.y * E4.z + E3.x * E4.y * E2.z
 				- E3.x * E2.y * E4.z - E2.x * E4.y * E3.z - E4.x * E3.y * E2.z;
 			float D2 = E1.x * E4.y * E3.z + E4.x * E3.y * E1.z + E3.x * E1.y * E4.z
@@ -42,7 +46,7 @@ namespace Trace {
 				float alpha = 1 - lamda - beita;
 				Vector3i* nIndices = &mesh->normalsIndices[i];
 
-				intersection.pos = mesh->vertices[index1] * alpha + mesh->vertices[index2] * lamda + mesh->vertices[index3] * beita;
+				intersection.pos = P1 * alpha + P2 * lamda + P3 * beita;
 				intersection.normal = mesh->normals[nIndices->x] * alpha + mesh->normals[nIndices->y] * lamda + mesh->normals[nIndices->z] * beita;
 				/*intersect.texel = cuboid.texels[index1] * t + cuboid.texels[index2] * lamda + cuboid.texels[index3] * beita;
 				intersect.tangent = cuboid.tangents[index1] * t + cuboid.tangents[index2] * lamda + cuboid.tangents[index3] * beita;
@@ -66,7 +70,7 @@ namespace Trace {
 		for (auto obj : objs) {
 			if (obj->boundingBox->intersect(ray))
 			{
-				if (intersect_Triangle(ray, intersection, obj->mesh, minZ)) {
+				if (intersect_Triangle(ray, intersection, obj, minZ)) {
 					*object = (Obj*)obj;
 					res = true;
 				}

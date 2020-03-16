@@ -1,5 +1,6 @@
 #pragma once
 #include "BoundingBox.hpp"
+
 class AABB : public BoundingBox {
 public:
 	Vector3f minP, maxP;

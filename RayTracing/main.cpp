@@ -188,9 +188,8 @@ int main(void)
 
 		//初始化网格
 		Mesh mesh_cuboid, mesh_plane;
-		buildMeshFromFile(mesh_cuboid, "Mesh/cuboid.obj");//Lemonade_Can.obj");
+		buildMeshFromFile(mesh_cuboid, "Mesh/sphere16.obj");//ironmanhelmet
 		buildMeshFromFile(mesh_plane, "Mesh/plane.obj");
-		//mesh_cuboid.Zoom(25);
 		mesh_cuboid.buildFacet();
 		mesh_plane.buildFacet();
 
@@ -201,6 +200,7 @@ int main(void)
 		cuboid.mesh = &mesh_cuboid;
 		cuboid.matarial = &mt_cuboid;
 		cuboid.shader = &lambert;
+		cuboid.Zoom(0.5);
 		
 		plane.mesh = &mesh_plane;
 		plane.matarial = &mt_plane;
@@ -224,7 +224,7 @@ int main(void)
 	//设置主相机
 	Camera camera;
 
-	camera.pos = { 3, 3, -3 };
+	camera.pos = { 3, 3, 3 };
 	camera.vpn = -camera.pos;
 
 	/*camera.pos = { -0.4, 1.7, 1.24 };
@@ -257,6 +257,9 @@ int main(void)
 
 	DWORD t_start;
 
+	float R = sqrt(pow(camera.pos.x, 2) + pow(camera.pos.y, 2));
+	int theta = 0;
+
 	while (1) {
 
 		t_start = GetTickCount64();
@@ -264,7 +267,7 @@ int main(void)
 		camera.refresh();
 
 		for (int j = 0; j < window_height; j++) {
-			printf("\r");
+			printf("\r");//表示将光标的位置回退到本行的开头位置
 			printf("Rendering  %d % ------ ", 100 * j / (window_height)+1);
 			for (int i = 0; i < window_width; i++)
 			{
@@ -274,35 +277,44 @@ int main(void)
 			}
 		}
 
-		Vector3f camera_z = camera.vpn.crossProduct(camera.up);
-		camera_z.normalized();
-		camera_z *= Camera_Speed;
+		//手动移动摄像头
+		//Vector3f camera_z = camera.vpn.crossProduct(camera.up);
+		//camera_z.normalized();
+		//camera_z *= Camera_Speed;
 
-		if (screen_keys[0x41]) camera.pos = camera.pos + camera_z;//a
-		if (screen_keys[0x44]) camera.pos = camera.pos - camera_z;//d
+		//if (screen_keys[0x41]) camera.pos = camera.pos + camera_z;//a
+		//if (screen_keys[0x44]) camera.pos = camera.pos - camera_z;//d
 
-		//camera.pos.x += 0.1f;//d
-		if (screen_keys[0x57]) camera.pos = camera.pos + camera.vpn;//w
-		if (screen_keys[0x53]) camera.pos = camera.pos - camera.vpn;//s
+		////camera.pos.x += 0.1f;//d
+		//if (screen_keys[0x57]) camera.pos = camera.pos + camera.vpn;//w
+		//if (screen_keys[0x53]) camera.pos = camera.pos - camera.vpn;//s
 
-		float thetaY = 0, thetaZ = 0;
-		if (screen_keys[VK_LEFT]) thetaY = -Camera_RotateSpeed;
-		if (screen_keys[VK_RIGHT]) thetaY = Camera_RotateSpeed;
-		if (screen_keys[VK_UP]) thetaZ = -Camera_RotateSpeed;
-		if (screen_keys[VK_DOWN]) thetaZ = Camera_RotateSpeed;
+		//float thetaY = 0, thetaZ = 0;
+		//if (screen_keys[VK_LEFT]) thetaY = -Camera_RotateSpeed;
+		//if (screen_keys[VK_RIGHT]) thetaY = Camera_RotateSpeed;
+		//if (screen_keys[VK_UP]) thetaZ = -Camera_RotateSpeed;
+		//if (screen_keys[VK_DOWN]) thetaZ = Camera_RotateSpeed;
 
-		//乘以四元数旋转矩阵
-		Matrix4 m1, m2;
-		matrix_set_rotate(&m1, 0, 1, 0, thetaY);
-		if (camera.vpn.x > 0) matrix_set_rotate(&m2, 0, 0, -1, thetaZ);
-		else  matrix_set_rotate(&m2, 0, 0, 1, thetaZ);
-		camera.vpn = matrix_apply(m1, camera.vpn);
-		camera.vpn = matrix_apply(m2, camera.vpn);
+		////乘以四元数旋转矩阵
+		//Matrix4 m1, m2;
+		//matrix_set_rotate(&m1, 0, 1, 0, thetaY);
+		//if (camera.vpn.x > 0) matrix_set_rotate(&m2, 0, 0, -1, thetaZ);
+		//else  matrix_set_rotate(&m2, 0, 0, 1, thetaZ);
+		//camera.vpn = matrix_apply(m1, camera.vpn);
+		//camera.vpn = matrix_apply(m2, camera.vpn);
+
+		float diff = GetTickCount64() - t_start;
+		float speed = Camera_RotateSpeed;
+		theta += speed * diff/30;
+		theta = fmod(theta, 2*pi);
+		camera.pos.x = R * sin(theta);
+		camera.pos.z = R * cos(theta);
+		camera.vpn = -camera.pos;
 
 		screen_update();
 
-		float shrub = (float)10000 / (GetTickCount64() - t_start);
-		cout << "帧数：" << shrub << " --------------  耗时ms:"<< GetTickCount64() - t_start <<endl;
+		float shrub = (float)10000 / diff;
+		//cout << "帧数：" << shrub << " --------------  耗时ms:"<< GetTickCount64() - t_start <<endl;
 
 		Sleep(1);
 	}
