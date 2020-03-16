@@ -196,18 +196,32 @@ int main(void)
 		//使用的shader
 		Lambert lambert;
 
-		Obj cuboid, plane;
+		Obj cuboid, plane1, plane2, plane3;
 		cuboid.mesh = &mesh_cuboid;
 		cuboid.matarial = &mt_cuboid;
 		cuboid.shader = &lambert;
-		cuboid.Zoom(0.5);
+		//cuboid.zoom(0.5);
 		
-		plane.mesh = &mesh_plane;
-		plane.matarial = &mt_plane;
-		plane.shader = &lambert;
+		plane1.mesh = &mesh_plane;
+		plane1.matarial = &mt_plane;
+		plane1.shader = &lambert;
+
+		plane2.mesh = &mesh_plane;
+		plane2.matarial = &mt_plane;
+		plane2.shader = &lambert;
+		plane2.rotate(Vector3f(1, 0, 0), pi / 2);
+		plane2.translate(Vector3f(0, 1, -3));
+
+		plane3.mesh = &mesh_plane;
+		plane3.matarial = &mt_plane;
+		plane3.shader = &lambert;
+		plane3.rotate(Vector3f(0, 0, 1), pi / 2);
+		plane3.translate(Vector3f(-3, 1, 0));
 
 		objs.push_back(&cuboid);
-		objs.push_back(&plane);
+		objs.push_back(&plane1);
+		objs.push_back(&plane2);
+		objs.push_back(&plane3);
 
 		//生成AABB包围盒
 		for (auto obj : objs)
@@ -224,7 +238,7 @@ int main(void)
 	//设置主相机
 	Camera camera;
 
-	camera.pos = { 3, 3, 3 };
+	camera.pos = { 5, 5, 5 };
 	camera.vpn = -camera.pos;
 
 	/*camera.pos = { -0.4, 1.7, 1.24 };

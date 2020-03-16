@@ -26,6 +26,7 @@ public:
 		maxP.x = maxP.y = maxP.z = INT_MIN;
 		minP.x = minP.y = minP.z = INT_MAX;
 		for (auto p : mesh->vertices) {
+			p = matrix_mul(this->transform, p);
 			if (p.x > maxP.x) maxP.x = p.x;
 			if (p.x < minP.x) minP.x = p.x;
 			if (p.y > maxP.y) maxP.y = p.y;
@@ -39,12 +40,20 @@ public:
 	}
 
 
-	void Zoom(double ratio) {
+	void zoom(double ratio) {
 		for (int i = 0; i < 4; i++)
 			transform.m[i][i] *= ratio;
 	}
 
-	void Rotate() {
+	void rotate(Vector3f dir, float theta) {
+		Matrix4 m;
+		matrix_set_rotate(&m, dir, theta);
+		transform = transform * m;
+	}
 
+	void translate(Vector3f dir) {
+		transform.m[3][0] += dir.x;
+		transform.m[3][1] += dir.y;
+		transform.m[3][2] += dir.z;
 	}
 };

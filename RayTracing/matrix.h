@@ -45,7 +45,8 @@ static Vector3f  matrix_mul(const Matrix4& m, const Vector3f& x) {
 }
 
 // Ðý×ª¾ØÕó
-static void matrix_set_rotate(Matrix4* m, float x, float y, float z, float theta) {
+static void matrix_set_rotate(Matrix4* m, Vector3f dir, float theta) {
+	float x = dir.x, y = dir.y, z = dir.z;
 	float qsin = (float)sin(theta * 0.5f);
 	float qcos = (float)cos(theta * 0.5f);
 	Vector3f vec{ x, y, z };

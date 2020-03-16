@@ -48,6 +48,7 @@ namespace Trace {
 
 				intersection.pos = P1 * alpha + P2 * lamda + P3 * beita;
 				intersection.normal = mesh->normals[nIndices->x] * alpha + mesh->normals[nIndices->y] * lamda + mesh->normals[nIndices->z] * beita;
+				intersection.normal = matrix_mul(object->transform, intersection.normal);
 				/*intersect.texel = cuboid.texels[index1] * t + cuboid.texels[index2] * lamda + cuboid.texels[index3] * beita;
 				intersect.tangent = cuboid.tangents[index1] * t + cuboid.tangents[index2] * lamda + cuboid.tangents[index3] * beita;
 				intersect.biTangent = cuboid.biTangents[index1] * t + cuboid.biTangents[index2] * lamda + cuboid.biTangents[index3] * beita;
