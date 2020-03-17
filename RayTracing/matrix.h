@@ -44,7 +44,7 @@ static Vector3f  matrix_mul(const Matrix4& m, const Vector3f& x) {
 	return y;
 }
 
-// Ğı×ª¾ØÕó
+// Ğı×ª¾ØÕó£¬ ÈÆÖáxyz Ğı×ªtheta ¶È
 static void matrix_set_rotate(Matrix4* m, Vector3f dir, float theta) {
 	float x = dir.x, y = dir.y, z = dir.z;
 	float qsin = (float)sin(theta * 0.5f);

@@ -20,7 +20,7 @@ public:
 	}*/
 	Vector3f shade(const Ray& ray, const Intersection& intersection, const Light* light, const Matarial* mt) override {
 		float temp = max(0.0, ray.dir.dot(-intersection.normal));
-		return light->color * mt->color * temp;//Vector3f(256, 0, 0.);
+		return light->color * mt->color * temp;//mt->color;//
 	}
 };
 

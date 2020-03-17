@@ -180,46 +180,56 @@ int main(void)
 
 	//初始化模型
 		//初始化材质
-		Matarial mt_cuboid, mt_plane;
-		mt_cuboid.color = { 255, 0, 255 };
-		mt_cuboid.reflFactor = 0.01;
-		mt_plane.color = { 100, 100, 100 };
-		mt_plane.reflFactor = 0.4;
+		Matarial mt_sphere1, mt_plane1, mt_plane2, mt_plane3;
+		mt_sphere1.color = { 111, 111, 111 };
+		mt_sphere1.reflFactor = 0.7;
+		mt_plane1.color = { 0, 0, 255 };
+		mt_plane2.color = { 255, 0, 0 };
+		mt_plane3.color = { 0, 255, 0 };
+		mt_plane1.reflFactor = mt_plane2.reflFactor = mt_plane3.reflFactor = 0;
 
 		//初始化网格
-		Mesh mesh_cuboid, mesh_plane;
-		buildMeshFromFile(mesh_cuboid, "Mesh/sphere16.obj");//ironmanhelmet
+		Mesh mesh_sphere1, mesh_plane;
+		buildMeshFromFile(mesh_sphere1, "Mesh/sphere16.obj");//ironmanhelmet
 		buildMeshFromFile(mesh_plane, "Mesh/plane.obj");
-		mesh_cuboid.buildFacet();
+		mesh_sphere1.buildFacet();
 		mesh_plane.buildFacet();
 
 		//使用的shader
 		Lambert lambert;
 
-		Obj cuboid, plane1, plane2, plane3;
-		cuboid.mesh = &mesh_cuboid;
-		cuboid.matarial = &mt_cuboid;
-		cuboid.shader = &lambert;
-		//cuboid.zoom(0.5);
+		Obj sphere1, sphere2, plane1, plane2, plane3;
+		sphere1.mesh = &mesh_sphere1;
+		sphere1.matarial = &mt_sphere1;
+		sphere1.shader = &lambert;
+		sphere1.zoom(0.5);
+		sphere1.translate(Vector3f(1, 0, 0));
+		
+		sphere2.mesh = &mesh_sphere1;
+		sphere2.matarial = &mt_sphere1;
+		sphere2.shader = &lambert;
+		sphere2.zoom(0.5);
+		sphere2.translate(Vector3f(0, 0, 1));
 		
 		plane1.mesh = &mesh_plane;
-		plane1.matarial = &mt_plane;
+		plane1.matarial = &mt_plane1;
 		plane1.shader = &lambert;
-		plane1.translate(Vector3f(0, -2, 0));
+		plane1.translate(Vector3f(0, -1, 0));
 
 		plane2.mesh = &mesh_plane;
-		plane2.matarial = &mt_plane;
+		plane2.matarial = &mt_plane2;
 		plane2.shader = &lambert;
 		plane2.rotate(Vector3f(1, 0, 0), pi / 2);
-		plane2.translate(Vector3f(0, -2, -4));
+		plane2.translate(Vector3f(0, 1, -2));
 
 		plane3.mesh = &mesh_plane;
-		plane3.matarial = &mt_plane;
+		plane3.matarial = &mt_plane3;
 		plane3.shader = &lambert;
-		plane3.rotate(Vector3f(0, 0, 1), pi / 2);
-		plane3.translate(Vector3f(-4, -2, 0));
+		plane3.rotate(Vector3f(0, 0, 1), -pi / 2);
+		plane3.translate(Vector3f(-2, 1, 0));
 
-		objs.push_back(&cuboid);
+		objs.push_back(&sphere1);
+		objs.push_back(&sphere2);
 		objs.push_back(&plane1);
 		objs.push_back(&plane2);
 		objs.push_back(&plane3);
@@ -239,7 +249,7 @@ int main(void)
 	//设置主相机
 	Camera camera;
 
-	camera.pos = { 5, 5, 5 };
+	camera.pos = { 2, 3, 2 };
 	camera.vpn = -camera.pos;
 
 	/*camera.pos = { -0.4, 1.7, 1.24 };

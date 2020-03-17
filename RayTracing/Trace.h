@@ -14,18 +14,18 @@ namespace Trace {
 	boolean intersect_Triangle(const Ray& ray, Intersection& intersection, Obj* object, float& minZ) {
 
 		boolean find = false;
-		Mesh *mesh = object->mesh;
+		Mesh* mesh = object->mesh;
 
 		for (int i = 0; i < mesh->numFaces; i++) {
 
 			Vector3i* pIndices = &mesh->vertexIndices[i];
 			int index1 = pIndices->data[0], index3 = pIndices->data[1], index2 = pIndices->data[2];
-			Vector3f P1 = matrix_mul(object->transform, mesh->vertices[index1]),
-				P2 = matrix_mul(object->transform, mesh->vertices[index2]), 
-				P3 = matrix_mul(object->transform, mesh->vertices[index3]);
+			Vector3f P1 = matrix_mul(object->transform, matrix_mul(object->rotation, mesh->vertices[index1])),
+				P2 = matrix_mul(object->transform, matrix_mul(object->rotation, mesh->vertices[index2])),
+				P3 = matrix_mul(object->transform, matrix_mul(object->rotation, mesh->vertices[index3]));
 			Vector3f E1 = ray.dir,
-				E2 = P1 - P2 ,
-				E3 = P1 - P3 ,
+				E2 = P1 - P2,
+				E3 = P1 - P3,
 				E4 = P1 - ray.pos;
 			float D1 = E4.x * E2.y * E3.z + E2.x * E3.y * E4.z + E3.x * E4.y * E2.z
 				- E3.x * E2.y * E4.z - E2.x * E4.y * E3.z - E4.x * E3.y * E2.z;
@@ -39,7 +39,7 @@ namespace Trace {
 			float lamda = D2 / D;
 			float beita = D3 / D;
 			//minZ约束离光线最近的
-			if (t > c2z&& c2z < lamda && lamda <= 1 && c2z < beita && beita <= 1 && lamda + beita <= 1 && t < minZ) {
+			if (t > c2z&& 0 < lamda && lamda <= 1 && 0 < beita && beita <= 1 && lamda + beita <= 1 && t < minZ) {
 
 				minZ = t;
 
@@ -47,12 +47,12 @@ namespace Trace {
 				Vector3i* nIndices = &mesh->normalsIndices[i];
 
 				intersection.pos = P1 * alpha + P2 * lamda + P3 * beita;
-				intersection.normal = matrix_mul(object->transform, mesh->normals[nIndices->x]) * alpha 
-					+ matrix_mul(object->transform, mesh->normals[nIndices->y]) * lamda
-					+ matrix_mul(object->transform, mesh->normals[nIndices->z]) * beita;
-				/*intersect.texel = cuboid.texels[index1] * t + cuboid.texels[index2] * lamda + cuboid.texels[index3] * beita;
-				intersect.tangent = cuboid.tangents[index1] * t + cuboid.tangents[index2] * lamda + cuboid.tangents[index3] * beita;
-				intersect.biTangent = cuboid.biTangents[index1] * t + cuboid.biTangents[index2] * lamda + cuboid.biTangents[index3] * beita;
+				intersection.normal = matrix_mul(object->rotation, mesh->normals[nIndices->x]) * alpha
+					+ matrix_mul(object->rotation, mesh->normals[nIndices->y]) * lamda
+					+ matrix_mul(object->rotation, mesh->normals[nIndices->z]) * beita;
+				/*intersect.texel = 
+				intersect.tangent 
+				intersect.biTangent = 
 				*/
 
 				find = true;

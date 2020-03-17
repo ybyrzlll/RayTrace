@@ -1,6 +1,6 @@
 #pragma once
 #define EXP (1.0001);
-#define reflTimes 3//追踪间接光反射的次数
+#define reflTimes 4//追踪间接光反射的次数
 #define Camera_Speed 0.1;
 #define Camera_RotateSpeed 0.02;
 int window_width = 400, window_height = 300;

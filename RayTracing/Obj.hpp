@@ -8,7 +8,7 @@
 
 struct Obj {
 public:
-	Matrix4 transform;
+	Matrix4 transform, rotation;
 	Mesh *mesh;
 	Matarial* matarial;
 	BaseShader* shader;
@@ -16,8 +16,10 @@ public:
 	BoundingBox *boundingBox;
 	
 	Obj() {
-		for (int i = 0; i < 4; i++)
+		for (int i = 0; i < 4; i++) {
 			transform.m[i][i] = 1;
+			rotation.m[i][i] = 1;
+		}
 	};
 	~Obj() {};
 
@@ -26,6 +28,7 @@ public:
 		maxP.x = maxP.y = maxP.z = INT_MIN;
 		minP.x = minP.y = minP.z = INT_MAX;
 		for (auto p : mesh->vertices) {
+			p = matrix_mul(this->rotation, p);
 			p = matrix_mul(this->transform, p);
 			if (p.x > maxP.x) maxP.x = p.x;
 			if (p.x < minP.x) minP.x = p.x;
@@ -46,9 +49,7 @@ public:
 	}
 
 	void rotate(Vector3f dir, float theta) {
-		Matrix4 m;
-		matrix_set_rotate(&m, dir, theta);
-		transform = transform * m;
+		matrix_set_rotate(&rotation, dir, theta);
 	}
 
 	void translate(Vector3f dir) {
