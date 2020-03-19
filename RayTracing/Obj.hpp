@@ -20,6 +20,7 @@ public:
 			transform.m[i][i] = 1;
 			rotation.m[i][i] = 1;
 		}
+		boundingBox = nullptr;
 	};
 	~Obj() {};
 

@@ -180,63 +180,82 @@ int main(void)
 
 	//初始化模型
 		//初始化材质
-		Matarial mt_sphere1, mt_plane1, mt_plane2, mt_plane3;
-		mt_sphere1.color = { 111, 111, 111 };
-		mt_sphere1.reflFactor = 0.7;
-		mt_plane1.color = { 0, 0, 255 };
-		mt_plane2.color = { 255, 0, 0 };
-		mt_plane3.color = { 0, 255, 0 };
-		mt_plane1.reflFactor = mt_plane2.reflFactor = mt_plane3.reflFactor = 0;
+	Matarial mt_sphere1, mt_plane1, mt_plane2, mt_plane3, mt_plane4, mt_plane5;
+	mt_sphere1.color = { 22, 22, 22 };
+	mt_sphere1.reflFactor = 0.7;
+	mt_plane1.color = { 0, 0, 255 };//bottom
+	mt_plane2.color = { 255, 0, 0 };//z
+	mt_plane3.color = { 0, 255, 0 };//x
+	mt_plane4.color = { 255, 0, 255 };//top
+	mt_plane5.color = { 0, 255, 155 };//+z
+	mt_plane1.reflFactor = mt_plane2.reflFactor 
+		= mt_plane3.reflFactor = mt_plane4.reflFactor 
+		= mt_plane5.reflFactor = 0;
 
-		//初始化网格
-		Mesh mesh_sphere1, mesh_plane;
-		buildMeshFromFile(mesh_sphere1, "Mesh/sphere16.obj");//ironmanhelmet
-		buildMeshFromFile(mesh_plane, "Mesh/plane.obj");
-		mesh_sphere1.buildFacet();
-		mesh_plane.buildFacet();
+	//初始化网格
+	Mesh mesh_sphere1, mesh_plane;
+	buildMeshFromFile(mesh_sphere1, "Mesh/sphere16.obj");//ironmanhelmet
+	buildMeshFromFile(mesh_plane, "Mesh/plane.obj");
+	mesh_sphere1.buildFacet();
+	mesh_plane.buildFacet();
 
-		//使用的shader
-		Lambert lambert;
+	//使用的shader
+	Lambert lambert;
 
-		Obj sphere1, sphere2, plane1, plane2, plane3;
-		sphere1.mesh = &mesh_sphere1;
-		sphere1.matarial = &mt_sphere1;
-		sphere1.shader = &lambert;
-		sphere1.zoom(0.5);
-		sphere1.translate(Vector3f(1, 0, 0));
-		
-		sphere2.mesh = &mesh_sphere1;
-		sphere2.matarial = &mt_sphere1;
-		sphere2.shader = &lambert;
-		sphere2.zoom(0.5);
-		sphere2.translate(Vector3f(0, 0, 1));
-		
-		plane1.mesh = &mesh_plane;
-		plane1.matarial = &mt_plane1;
-		plane1.shader = &lambert;
-		plane1.translate(Vector3f(0, -1, 0));
+	Obj sphere1, sphere2, plane1, plane2, plane3, plane4, plane5;
+	sphere1.mesh = &mesh_sphere1;
+	sphere1.matarial = &mt_sphere1;
+	sphere1.shader = &lambert;
+	sphere1.zoom(0.5);
+	sphere1.translate(Vector3f(-0.5, -0.5, -0.5));
+	//sphere1.buildAABB();
 
-		plane2.mesh = &mesh_plane;
-		plane2.matarial = &mt_plane2;
-		plane2.shader = &lambert;
-		plane2.rotate(Vector3f(1, 0, 0), pi / 2);
-		plane2.translate(Vector3f(0, 1, -2));
+	sphere2.mesh = &mesh_sphere1;
+	sphere2.matarial = &mt_sphere1;
+	sphere2.shader = &lambert;
+	sphere2.zoom(0.5);
+	sphere2.translate(Vector3f(-0.5, 0.4, 1));
+	//sphere2.buildAABB();
 
-		plane3.mesh = &mesh_plane;
-		plane3.matarial = &mt_plane3;
-		plane3.shader = &lambert;
-		plane3.rotate(Vector3f(0, 0, 1), -pi / 2);
-		plane3.translate(Vector3f(-2, 1, 0));
+	plane1.mesh = &mesh_plane;
+	plane1.matarial = &mt_plane1;
+	plane1.shader = &lambert;
+	plane1.translate(Vector3f(0, -1, 0));
 
-		objs.push_back(&sphere1);
-		objs.push_back(&sphere2);
-		objs.push_back(&plane1);
-		objs.push_back(&plane2);
-		objs.push_back(&plane3);
+	plane2.mesh = &mesh_plane;
+	plane2.matarial = &mt_plane2;
+	plane2.shader = &lambert;
+	plane2.rotate(Vector3f(1, 0, 0), pi / 2);
+	plane2.translate(Vector3f(0, 1, -2));
 
-		//生成AABB包围盒
-		for (auto obj : objs)
-			obj->buildAABB();
+	plane3.mesh = &mesh_plane;
+	plane3.matarial = &mt_plane3;
+	plane3.shader = &lambert;
+	plane3.rotate(Vector3f(0, 0, 1), -pi / 2);
+	plane3.translate(Vector3f(-2, 1, 0));
+
+	plane4.mesh = &mesh_plane;
+	plane4.matarial = &mt_plane4;
+	plane4.shader = &lambert;
+	plane4.rotate(Vector3f(0, 0, 1), pi);
+	plane4.translate(Vector3f(0, 2.5, 0));
+
+	plane5.mesh = &mesh_plane;
+	plane5.matarial = &mt_plane5;
+	plane5.shader = &lambert;
+	plane5.rotate(Vector3f(1, 0, 0), -pi/2);
+	plane5.translate(Vector3f(0, 1, 2));
+
+	objs.push_back(&sphere1);
+	objs.push_back(&sphere2);
+	objs.push_back(&plane1);
+	objs.push_back(&plane2);
+	objs.push_back(&plane3);
+	objs.push_back(&plane4);
+	objs.push_back(&plane5);
+
+	for (auto& obj : objs)
+		obj->buildAABB();
 
 
 	//初始化窗口并设置标题
@@ -249,8 +268,8 @@ int main(void)
 	//设置主相机
 	Camera camera;
 
-	camera.pos = { 2, 3, 2 };
-	camera.vpn = -camera.pos;
+	camera.pos = { 3, 1.4, -0.3 };
+	camera.vpn = { -1, 0, 0.1 };
 
 	/*camera.pos = { -0.4, 1.7, 1.24 };
 	camera.vpn = { 1.4, 3.3, 2.2 };*/
