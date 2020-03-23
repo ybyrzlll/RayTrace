@@ -174,7 +174,7 @@ int main(void)
 {
 	//初始化光源
 	Light light_a;
-	light_a.pos = { 2, 5, 2 };
+	light_a.pos = { 0, 3, 0 };
 	light_a.color = { 1, 1, 1 };
 	lights.push_back(&light_a);
 
@@ -207,14 +207,14 @@ int main(void)
 	sphere1.matarial = &mt_sphere1;
 	sphere1.shader = &lambert;
 	sphere1.zoom(0.5);
-	sphere1.translate(Vector3f(-0.5, -0.5, -0.5));
+	sphere1.translate(Vector3f(-0.7, -0.7, -0.7));
 	//sphere1.buildAABB();
 
 	sphere2.mesh = &mesh_sphere1;
 	sphere2.matarial = &mt_sphere1;
 	sphere2.shader = &lambert;
 	sphere2.zoom(0.5);
-	sphere2.translate(Vector3f(-0.5, 0.4, 1));
+	sphere2.translate(Vector3f(0.5, -0.7, 1));
 	//sphere2.buildAABB();
 
 	plane1.mesh = &mesh_plane;
@@ -238,7 +238,7 @@ int main(void)
 	plane4.matarial = &mt_plane4;
 	plane4.shader = &lambert;
 	plane4.rotate(Vector3f(0, 0, 1), pi);
-	plane4.translate(Vector3f(0, 2.5, 0));
+	plane4.translate(Vector3f(0, 3, 0));
 
 	plane5.mesh = &mesh_plane;
 	plane5.matarial = &mt_plane5;
@@ -251,7 +251,7 @@ int main(void)
 	objs.push_back(&plane1);
 	objs.push_back(&plane2);
 	objs.push_back(&plane3);
-	objs.push_back(&plane4);
+	//objs.push_back(&plane4);
 	objs.push_back(&plane5);
 
 	for (auto& obj : objs)
@@ -268,8 +268,8 @@ int main(void)
 	//设置主相机
 	Camera camera;
 
-	camera.pos = { 3, 1.4, -0.3 };
-	camera.vpn = { -1, 0, 0.1 };
+	camera.pos = { 3, 1.2, -0.7 };
+	camera.vpn = { -1, 0, 0.4 };
 
 	/*camera.pos = { -0.4, 1.7, 1.24 };
 	camera.vpn = { 1.4, 3.3, 2.2 };*/

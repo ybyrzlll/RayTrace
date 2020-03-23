@@ -107,37 +107,33 @@ namespace Trace {
 	Vector3f castRay(const Ray& ray, int times) {
 		Intersection intersection;
 		Obj* object = nullptr;
-		Vector3f res = { 0, 0, 0 };
+		Vector3f color = { 0, 0, 0 };
+		//matarial
 		if (intersect(ray, intersection, &object)) {
-			//todo 遍历光源
+			//直接光照
 			for (auto light : lights)
 			{
 				//阴影射线
-				//if (shadowRay(intersection, light)) {
-				//	//res += shade(ray, intersection, light);
-				//}
-				//else 
-				if (true)//matarial
+				if (!shadowRay(intersection, light))
 				{
-					res += object->shader->shade(ray, intersection, light, object->matarial);//(ray, intersection, light);
+					color += object->shader->shade(ray, intersection, light, object->matarial);//(ray, intersection, light);
 				}
 
 			}
 
 			//间接光照
-
-			//反射
 			if (times < reflTimes && true) {
-				Vector3f refl = reflection(intersection.normal, ray.dir);
+				Vector3f refl;
+				color += object->matarial->brdf(intersection, ray.dir, refl);
 				Ray ray2(intersection.pos, refl);
 				Vector3f temp = castRay(ray2, ++times) * object->matarial->reflFactor;
-				res += temp;
+				color += temp;
 			}
 
 			//todo: 折射
 		}
 		//todo 对光进行蒙特卡洛
-		return res;
+		return color;
 	}
 
 	Ray generateRay(float j, float i, Camera& camera) {
