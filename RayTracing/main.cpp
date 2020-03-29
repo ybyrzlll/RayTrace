@@ -15,6 +15,8 @@
 #include "Global.h"
 #include "matrix.h"
 #include "Camera.hpp"
+#include "Sampler.hpp"
+#include "Sampler_Halton.hpp"
 using namespace std;
 using namespace Trace;
 
@@ -180,38 +182,48 @@ int main(void)
 
 	//初始化模型
 		//初始化材质
-	Matarial mt_sphere1, mt_plane1, mt_plane2, mt_plane3, mt_plane4, mt_plane5;
-	mt_sphere1.color = { 22, 22, 22 };
-	mt_sphere1.reflFactor = 0.7;
+	Matarial mt_sphere, mt_plane1, mt_plane2, mt_plane3, mt_plane4, mt_plane5;
+	mt_sphere.color = { 22, 22, 22 };
+	mt_sphere.type = 1;
+	mt_sphere.reflFactor = 0.7;
+
 	mt_plane1.color = { 0, 0, 255 };//bottom
 	mt_plane2.color = { 255, 0, 0 };//z
 	mt_plane3.color = { 0, 255, 0 };//x
 	mt_plane4.color = { 255, 0, 255 };//top
 	mt_plane5.color = { 0, 255, 155 };//+z
-	mt_plane1.reflFactor = mt_plane2.reflFactor 
-		= mt_plane3.reflFactor = mt_plane4.reflFactor 
-		= mt_plane5.reflFactor = 0;
+	mt_plane1.type = mt_plane2.type
+		= mt_plane3.type = mt_plane4.type
+		= mt_plane5.type = 2;
+	mt_plane1.diffFactor = mt_plane2.diffFactor
+		= mt_plane3.diffFactor = mt_plane4.diffFactor
+		= mt_plane5.diffFactor = 1;
 
 	//初始化网格
-	Mesh mesh_sphere1, mesh_plane;
-	buildMeshFromFile(mesh_sphere1, "Mesh/sphere16.obj");//ironmanhelmet
+	Mesh mesh_sphere, mesh_plane;
+	buildMeshFromFile(mesh_sphere, "Mesh/sphere32.obj");//ironmanhelmet
 	buildMeshFromFile(mesh_plane, "Mesh/plane.obj");
-	mesh_sphere1.buildFacet();
+	mesh_sphere.buildFacet();
 	mesh_plane.buildFacet();
 
 	//使用的shader
 	Lambert lambert;
 
-	Obj sphere1, sphere2, plane1, plane2, plane3, plane4, plane5;
-	sphere1.mesh = &mesh_sphere1;
-	sphere1.matarial = &mt_sphere1;
+	Obj lamp, sphere1, sphere2, plane1, plane2, plane3, plane4, plane5;
+
+	lamp.emission = Vector3f(255, 255, 255);
+	lamp.mesh = &mesh_sphere;
+	lamp.translate(Vector3f(0, 3, 0));
+
+	sphere1.mesh = &mesh_sphere;
+	sphere1.matarial = &mt_sphere;
 	sphere1.shader = &lambert;
 	sphere1.zoom(0.5);
 	sphere1.translate(Vector3f(-0.7, -0.7, -0.7));
 	//sphere1.buildAABB();
 
-	sphere2.mesh = &mesh_sphere1;
-	sphere2.matarial = &mt_sphere1;
+	sphere2.mesh = &mesh_sphere;
+	sphere2.matarial = &mt_sphere;
 	sphere2.shader = &lambert;
 	sphere2.zoom(0.5);
 	sphere2.translate(Vector3f(0.5, -0.7, 1));
@@ -246,6 +258,7 @@ int main(void)
 	plane5.rotate(Vector3f(1, 0, 0), -pi/2);
 	plane5.translate(Vector3f(0, 1, 2));
 
+	objs.push_back(&lamp);
 	objs.push_back(&sphere1);
 	objs.push_back(&sphere2);
 	objs.push_back(&plane1);
@@ -257,6 +270,9 @@ int main(void)
 	for (auto& obj : objs)
 		obj->buildAABB();
 
+	//初始化采样器
+	Sampler *sampler = new HaltonSampler(2, 3);
+	double inv = 1.0 / screenSamples;
 
 	//初始化窗口并设置标题
 	char text[] = _T("YeahBin (software render ) - ");
@@ -315,9 +331,15 @@ int main(void)
 			printf("Rendering  %d % ------ ", 100 * j / (window_height)+1);
 			for (int i = 0; i < window_width; i++)
 			{
-				Ray ray = generateRay((float)j, (float)i, camera);
-				//todo: foreach light 微偏移
-				framebuffer[j][i] = v3f_2_UINT32(castRay(ray, 0));//((int)122 << 16) + ((int)122 << 8) + 122;
+				Vector3f sumColor(0, 0, 0);
+				for (int k = 0; k < screenSamples; k++) {
+					pair<double, double> offset = sampler->get2D();
+					Ray ray = generateRay((float)j + offset.first, (float)i + offset.second, camera);
+					sumColor += castRay(ray, 0);
+					//todo: foreach light 微偏移
+				}
+				
+				framebuffer[j][i] = v3f_2_UINT32(sumColor * inv);//((int)122 << 16) + ((int)122 << 8) + 122;
 			}
 		}
 
@@ -362,7 +384,12 @@ int main(void)
 		//cout << "帧数：" << shrub << " --------------  耗时ms:"<< GetTickCount64() - t_start <<endl;
 
 		Sleep(1);
+
+		break;
 	}
+
+	cin.get();
+	cin.get();
 
 	return 0;
 }

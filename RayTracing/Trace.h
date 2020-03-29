@@ -104,36 +104,107 @@ namespace Trace {
 	//	return intersection.obj->matarial->shader->shade(ray, intersection, light);
 	//}
 
+	Vector3f brdf(Vector3f in, Intersection& intersection, Vector3f out, Obj* object) {
+		//ray.dir, intersection, newDir
+
+		Vector3f res = { 0, 0, 0 };
+		Matarial* matarial = object->matarial;
+		if (matarial->type & 1) {
+			res += Vector3f(1, 1, 1) * matarial->reflFactor;
+		}
+		if (matarial->type & 2) {
+			res += Vector3f(1, 1, 1) * matarial->diffFactor;
+		}
+		if (matarial->type & 4) {
+		}
+		return res;
+	}
+
+	Vector3f samplingNewRay(Vector3f in, Intersection& inst, Obj* object) {
+		Matarial* matarial = object->matarial;
+		
+		if (matarial->type & 1) {
+			return reflection(inst.normal, in);
+		}
+		if (matarial->type & 2) {
+			float rdx, rdy, rdz;
+			float magnitude;
+
+			do {
+				rdx = 2.0 * rand_0_1() - 1.0;
+				rdy = 2.0 * rand_0_1() - 1.0;
+				rdz = 2.0 * rand_0_1() - 1.0;
+				magnitude = sqrt(rdx * rdx + rdy * rdy + rdz * rdz);
+			} while (magnitude > 1.0);
+
+			Vector3f d = Vector3f(rdx / magnitude, rdy / magnitude, rdz / magnitude);
+			if (d.dot(inst.normal) < 0.0) {
+				d = -d;
+			}
+			return d;
+		}
+		if (matarial->type & 4) {
+		}
+	}
+
 	Vector3f castRay(const Ray& ray, int times) {
 		Intersection intersection;
 		Obj* object = nullptr;
-		Vector3f color = { 0, 0, 0 };
+		Vector3f res = { 0, 0, 0 };
+
 		//matarial
 		if (intersect(ray, intersection, &object)) {
-			//直接光照
-			for (auto light : lights)
-			{
-				//阴影射线
-				if (!shadowRay(intersection, light))
-				{
-					color += object->shader->shade(ray, intersection, light, object->matarial);//(ray, intersection, light);
-				}
 
+			//todo: 俄罗斯转盘
+			if (times > recurTimes)
+				return res;
+
+			//------------------合并直接光间接光的原始方法----------------------------
+			//Le
+			if (object->self_luminous()) {
+				/*if (times > 0) {
+					cout << "追到头了" << times;
+					showVector3(object->emission);
+					cout << endl;
+				}*/
+				return object->emission;
 			}
 
-			//间接光照
-			if (times < reflTimes && true) {
-				Vector3f refl;
-				color += object->matarial->brdf(intersection, ray.dir, refl);
-				Ray ray2(intersection.pos, refl);
-				Vector3f temp = castRay(ray2, ++times) * object->matarial->reflFactor;
-				color += temp;
-			}
+			//根据某种采样方法生成一个随机方向
+			Vector3f newDir = samplingNewRay(ray.dir, intersection, object);
+			Ray newRay(intersection.pos, newDir);
+
+			Vector3f indirect = castRay(newRay, times + 1);
+
+			Vector3f brdfV = brdf(ray.dir, intersection, newDir, object);
+
+			return object->matarial->color * brdfV * indirect * newRay.dir.dot(intersection.normal);
+
+
+			//------------------分开直接光间接光的方法----------------------------
+			////直接光照
+			//for (auto light : lights)
+			//{
+			//	//阴影射线
+			//	if (!shadowRay(intersection, light))
+			//	{
+			//		color += object->shader->shade(ray, intersection, light, object->matarial);//(ray, intersection, light);
+			//	}
+
+			//}
+
+			////间接光照
+			//if (times < reflTimes && true) {
+			//	Vector3f refl;
+			//	color += object->matarial->brdf(intersection, ray.dir, refl);
+			//	Ray ray2(intersection.pos, refl);
+			//	Vector3f temp = castRay(ray2, ++times) * object->matarial->reflFactor;
+			//	color += temp;
+			//}
 
 			//todo: 折射
 		}
-		//todo 对光进行蒙特卡洛
-		return color;
+		return res;
 	}
 
 	Ray generateRay(float j, float i, Camera& camera) {
@@ -149,5 +220,7 @@ namespace Trace {
 
 		return ray;
 	}
+
+	
 }
 

@@ -106,6 +106,10 @@ static Vector3f reflection(const Vector3f &normal, const Vector3f &in) {
 	return (V * 2 - in);//.normalized();
 }
 
+static float rand_0_1() {
+	return (float)rand() / RAND_MAX;
+}
+
 static UINT32 v3f_2_UINT32(Vector3f in) {
 	in.x = clamp(in.x, 0.0f, 255.0f);
 	in.y = clamp(in.y, 0.0f, 255.0f);

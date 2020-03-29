@@ -24,6 +24,11 @@ public:
 	};
 	~Obj() {};
 
+	Vector3f emission;
+	boolean self_luminous() {
+		return emission.x > 0 || emission.y > 0 || emission.z > 0;
+	};//光源或自发光
+
 	void buildAABB() {
 		Vector3f maxP, minP;
 		maxP.x = maxP.y = maxP.z = INT_MIN;
